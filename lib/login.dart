@@ -16,12 +16,6 @@ class _Login extends State<Login> {
   final TextEditingController passwordController = new TextEditingController();
   bool _obscureText1 = true;
 
-  void _togglevisibility() {
-    setState(() {
-      _obscureText1 = !_obscureText1;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -36,6 +30,12 @@ class _Login extends State<Login> {
           MaterialPageRoute(builder: (BuildContext context) => Home()),
           (Route<dynamic> route) => false);
     }
+  }
+
+  void _togglevisibility() {
+    setState(() {
+      _obscureText1 = !_obscureText1;
+    });
   }
 
   @override
@@ -74,7 +74,7 @@ class _Login extends State<Login> {
                 ),
                 Container(
                   padding: EdgeInsets.only(left: 20, right: 20),
-                  margin: EdgeInsets.only(bottom: 20),
+                  margin: EdgeInsets.only(bottom: 50),
                   child: TextField(
                     obscureText: _obscureText1,
                     controller: passwordController,
