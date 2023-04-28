@@ -35,7 +35,7 @@ class _RequestFormState extends State<RequestForm> {
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
           appBar: AppBar(
-            title: Text('Pemohonan ' + widget.form),
+            title: Text('Permohonan (' + widget.form + ')'),
             // backgroundColor: Colors.green,
             leading: GestureDetector(
               child: Icon(
