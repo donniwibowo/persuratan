@@ -16,6 +16,7 @@ class PermohonanModel {
   String date_end;
   String status;
   String is_open_for_notif;
+  String response_by;
   String alasan;
   String created_on;
   String created_by;
@@ -35,6 +36,7 @@ class PermohonanModel {
     required this.date_end,
     required this.status,
     required this.is_open_for_notif,
+    required this.response_by,
     required this.alasan,
     required this.created_on,
     required this.created_by,
@@ -56,6 +58,7 @@ class PermohonanModel {
         date_end: json["date_end"],
         status: json["status"],
         is_open_for_notif: json["is_open_for_notif"],
+        response_by: json["response_by"],
         alasan: json["alasan"],
         created_on: json["created_on"],
         created_by: json["created_by"],

@@ -429,7 +429,7 @@ class _HomeState extends State<Home> {
                                                   top: 3,
                                                   bottom: 0),
                                               child: Text(
-                                                api_data[index].updated_by,
+                                                api_data[index].response_by,
                                                 style: TextStyle(
                                                     fontSize: 15,
                                                     color: Colors.black),
