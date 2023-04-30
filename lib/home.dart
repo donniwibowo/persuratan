@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:persuratan/api/api_form.dart';
+import 'package:persuratan/api/api_permohonan.dart';
 import 'package:persuratan/login.dart';
 import 'package:persuratan/main.dart';
 import 'package:persuratan/model/form.dart';
+import 'package:persuratan/model/permohonan.dart';
 import 'package:persuratan/request_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +24,10 @@ class _HomeState extends State<Home> {
   late String selectedFormLabel;
   List<DropdownMenuItem<String>> formList = [];
   ApiForm api_form = ApiForm();
+  ApiPermohonan api_permohonan = ApiPermohonan();
+  late Future<List<PermohonanModel>> listPermohonan;
+
+  TextEditingController input_search = TextEditingController();
 
   Icon customIcon = const Icon(Icons.search);
   Widget customSearchBar = const Text('DMS | SUREL');
@@ -30,6 +36,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     selectedFormLabel = 'Sakit';
+    listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
   }
 
   @override
@@ -46,13 +53,14 @@ class _HomeState extends State<Home> {
                   setState(() {
                     if (customIcon.icon == Icons.search) {
                       customIcon = const Icon(Icons.cancel);
-                      customSearchBar = const ListTile(
+                      customSearchBar = ListTile(
                         leading: Icon(
                           Icons.search,
                           color: Colors.white,
                           size: 28,
                         ),
                         title: TextField(
+                          controller: input_search,
                           decoration: InputDecoration(
                             hintText: 'kata kunci..',
                             hintStyle: TextStyle(
@@ -65,6 +73,12 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             color: Colors.black,
                           ),
+                          onSubmitted: (value) {
+                            setState(() {
+                              listPermohonan =
+                                  api_permohonan.getAllPermohonan(value);
+                            });
+                          },
                         ),
                       );
                     } else {
@@ -219,157 +233,251 @@ class _HomeState extends State<Home> {
           ),
           body: SingleChildScrollView(
             padding: EdgeInsets.only(bottom: 50),
-            child: Column(
-              children: [
-                Container(
-                  padding:
-                      EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade400),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    padding: EdgeInsets.only(
-                        top: 10, left: 10, bottom: 10, right: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Perihal',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
+            child: FutureBuilder<List<PermohonanModel>>(
+              future: listPermohonan,
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return Container(
+                    padding: EdgeInsets.only(left: 18, top: 15),
+                    child: Text("Please wait.."),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return Container(
+                    padding: EdgeInsets.only(left: 18, top: 15),
+                    child: Text("Failed to load data"),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  List<PermohonanModel>? api_data = snapshot.data!;
+                  if (api_data.length > 0) {
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(
+                            top: 0, bottom: 150, right: 0, left: 0),
+                        itemCount: api_data.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                            padding: EdgeInsets.only(
+                                top: 10, left: 15, right: 15, bottom: 0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade400),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              padding: EdgeInsets.only(
+                                  top: 10, left: 10, bottom: 10, right: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Perihal',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Tgl Dibuat',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Tgl Diubah',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Form',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(top: 7),
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Approval',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 0,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                'Status',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black54),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 30),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                api_data[index].perihal,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                api_data[index].created_on,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                api_data[index].updated_on,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                '6043543545.pdf',
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: EdgeInsets.only(top: 7),
+                                              padding: EdgeInsets.only(
+                                                  left: 0,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 0),
+                                              child: Text(
+                                                api_data[index].updated_by,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Container(
+                                              color: Colors.red,
+                                              // margin: EdgeInsets.only(left: 10),
+                                              padding: EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 10,
+                                                  top: 3,
+                                                  bottom: 2),
+                                              child: Text(
+                                                api_data[index].status,
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    child: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                  )
+                                ],
                               ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Tgl Dibuat',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Tgl Diubah',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Form',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: 7),
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Approval',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 0, top: 3, bottom: 0),
-                                child: Text(
-                                  'Status',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black54),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 0, right: 10, top: 3, bottom: 0),
-                                child: Text(
-                                  'Form Hasil Test - Kevin',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 0, right: 10, top: 3, bottom: 0),
-                                child: Text(
-                                  '25 April 2023',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 0, right: 10, top: 3, bottom: 0),
-                                child: Text(
-                                  '25 April 2023',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(
-                                    left: 0, right: 10, top: 3, bottom: 0),
-                                child: Text(
-                                  '6043543545.pdf',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: 7),
-                                padding: EdgeInsets.only(
-                                    left: 0, right: 10, top: 3, bottom: 0),
-                                child: Text(
-                                  'Delvo Anderson, S. Kom',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ),
-                              Container(
-                                color: Colors.red,
-                                // margin: EdgeInsets.only(left: 10),
-                                padding: EdgeInsets.only(
-                                    left: 10, right: 10, top: 3, bottom: 2),
-                                child: Text(
-                                  'Approved',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                            ),
+                          );
+                        });
+                  } else {
+                    return Container(
+                      padding: EdgeInsets.only(left: 18, top: 15),
+                      child: Text("Tidak ada data"),
+                    );
+                  }
+                }
+                return Container(
+                  padding: EdgeInsets.only(left: 18, top: 15),
+                  child: Text("Tidak ada data"),
+                );
+              },
             ),
           )),
     );
