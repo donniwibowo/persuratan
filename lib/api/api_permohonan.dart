@@ -50,4 +50,27 @@ class ApiPermohonan extends ChangeNotifier {
       throw Exception('Failed to load Data');
     }
   }
+
+  Future<List<PermohonanModel>> getDetailPermohonan(
+      String permohonan_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+
+    final api_url =
+        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonan?user_token=' +
+            user_token +
+            '&permohonan_id=' +
+            permohonan_id;
+    final response = await http.get(Uri.parse(api_url));
+    if (response.statusCode == 200) {
+      final result =
+          json.decode(response.body)['data'].cast<Map<String, dynamic>>();
+      _data = result
+          .map<PermohonanModel>((json) => PermohonanModel.fromJson(json))
+          .toList();
+      return _data;
+    } else {
+      throw Exception('Failed to load Data');
+    }
+  }
 }
