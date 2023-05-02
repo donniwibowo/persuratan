@@ -350,9 +350,6 @@ class _DetailFormState extends State<DetailForm> {
                               bottom: BorderSide(color: Colors.grey.shade400))),
                     ),
                   ),
-                  // SizedBox(
-                  //   height: 20,
-                  // ),
                   Stack(
                     children: [
                       Container(
@@ -363,6 +360,43 @@ class _DetailFormState extends State<DetailForm> {
                             key: _pdfViewerKey,
                           )),
                     ],
+                  ),
+                  // SizedBox(
+                  //   height: 10,
+                  // ),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    child: ElevatedButton(
+                        onPressed: () {}, child: Text('Edit Form')),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                            child: Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green),
+                              onPressed: () {},
+                              child: Text('Terima')),
+                        )),
+                        Expanded(
+                            child: Container(
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red),
+                              onPressed: () {},
+                              child: Text('Tolak')),
+                        ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 30,
                   )
                 ],
               ),
