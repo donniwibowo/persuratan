@@ -41,10 +41,12 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     selectedFormLabel = 'Sakit';
+    selectedForm = "1";
     setState(() {
       listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
     });
     countNotif();
+    reloadData();
   }
 
   void countNotif() async {
@@ -61,6 +63,12 @@ class _HomeState extends State<Home> {
         notif_ctr = jsonResponse['data'];
       });
     }
+  }
+
+  reloadData() {
+    setState(() {
+      listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
+    });
   }
 
   @override

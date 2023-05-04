@@ -104,7 +104,8 @@ class _DetailFormState extends State<DetailForm> {
                 Icons.arrow_back_ios,
               ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Home()));
               },
             ),
           ),

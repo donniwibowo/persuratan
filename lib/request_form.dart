@@ -55,7 +55,9 @@ class _RequestFormState extends State<RequestForm> {
       selectedJenisPeminjaman = "0";
     }
 
-    getDataPermohonan(widget.permohonan_id);
+    if (widget.permohonan_id != "0") {
+      getDataPermohonan(widget.permohonan_id);
+    }
   }
 
   getDataPermohonan(String _id) async {
