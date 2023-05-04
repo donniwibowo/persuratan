@@ -40,11 +40,27 @@ class _DetailFormState extends State<DetailForm> {
   late Future<List<PermohonanModel>> detail_permohonan;
 
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+  String is_superadmin = "0";
 
   @override
   void initState() {
     super.initState();
+    checkIsSuperadmin();
+
     detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+  }
+
+  checkIsSuperadmin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      is_superadmin = prefs.getString('is_superadmin') ?? "0";
+    });
+  }
+
+  reloadData() {
+    setState(() {
+      detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+    });
   }
 
   @override
@@ -370,29 +386,172 @@ class _DetailFormState extends State<DetailForm> {
                     child: ElevatedButton(
                         onPressed: () {}, child: Text('Edit Form')),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                            child: Container(
-                          padding: EdgeInsets.only(right: 5),
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green),
-                              onPressed: () {},
-                              child: Text('Terima')),
-                        )),
-                        Expanded(
-                            child: Container(
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red),
-                              onPressed: () {},
-                              child: Text('Tolak')),
-                        ))
-                      ],
+                  Visibility(
+                    visible: is_superadmin == "1" ? true : false,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: Row(
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                              child: Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green),
+                                onPressed: () {
+                                  Widget cancelButton = ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white),
+                                    child: Text(
+                                      "Tutup",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+                                    },
+                                  );
+                                  Widget continueButton = ElevatedButton(
+                                    child: Text("Terima"),
+                                    onPressed: () async {
+                                      Map data = {
+                                        'permohonan_id': widget.form_id,
+                                        'status': 'approved'
+                                      };
+
+                                      SharedPreferences sharedPreferences =
+                                          await SharedPreferences.getInstance();
+
+                                      var user_token = sharedPreferences
+                                          .getString("user_token");
+
+                                      var jsonResponse = null;
+                                      String api_url =
+                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                              user_token!;
+
+                                      var response = await http
+                                          .post(Uri.parse(api_url), body: data);
+
+                                      jsonResponse = json.decode(response.body);
+
+                                      if (jsonResponse['status'] == 200) {
+                                        reloadData();
+
+                                        Navigator.of(context,
+                                                rootNavigator: true)
+                                            .pop();
+
+                                        final snackbar = SnackBar(
+                                            content: Text(
+                                                "Dokumen permohonan telah disetujui"));
+                                        _messangerKey.currentState!
+                                            .showSnackBar(snackbar);
+                                      } else {
+                                        print(jsonResponse['field_error']);
+                                      }
+                                    },
+                                  );
+                                  AlertDialog alert = AlertDialog(
+                                    title: Text("Konfirmasi"),
+                                    content: Text(
+                                        "Apakah anda yakin untuk menyetujui permohonan ini?"),
+                                    actions: [
+                                      cancelButton,
+                                      continueButton,
+                                    ],
+                                  );
+                                  // show the dialog
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alert;
+                                    },
+                                  );
+                                },
+                                child: Text('Terima')),
+                          )),
+                          Expanded(
+                              child: Container(
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red),
+                                onPressed: () {
+                                  Widget cancelButton = ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white),
+                                    child: Text(
+                                      "Tutup",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+                                    },
+                                  );
+                                  Widget continueButton = ElevatedButton(
+                                    child: Text("Tolak"),
+                                    onPressed: () async {
+                                      Map data = {
+                                        'permohonan_id': widget.form_id,
+                                        'status': 'rejected'
+                                      };
+
+                                      SharedPreferences sharedPreferences =
+                                          await SharedPreferences.getInstance();
+
+                                      var user_token = sharedPreferences
+                                          .getString("user_token");
+
+                                      var jsonResponse = null;
+                                      String api_url =
+                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                              user_token!;
+
+                                      var response = await http
+                                          .post(Uri.parse(api_url), body: data);
+
+                                      jsonResponse = json.decode(response.body);
+
+                                      if (jsonResponse['status'] == 200) {
+                                        reloadData();
+
+                                        Navigator.of(context,
+                                                rootNavigator: true)
+                                            .pop();
+
+                                        final snackbar = SnackBar(
+                                            content: Text(
+                                                "Dokumen permohonan telah ditolak"));
+                                        _messangerKey.currentState!
+                                            .showSnackBar(snackbar);
+                                      } else {
+                                        print(jsonResponse['field_error']);
+                                      }
+                                    },
+                                  );
+                                  AlertDialog alert = AlertDialog(
+                                    title: Text("Konfirmasi"),
+                                    content: Text(
+                                        "Apakah anda yakin untuk menolak permohonan ini?"),
+                                    actions: [
+                                      cancelButton,
+                                      continueButton,
+                                    ],
+                                  );
+                                  // show the dialog
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alert;
+                                    },
+                                  );
+                                },
+                                child: Text('Tolak')),
+                          ))
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(

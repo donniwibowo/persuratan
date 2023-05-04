@@ -24,7 +24,8 @@ class _Login extends State<Login> {
 
   isLogin() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    // prefs.clear();
+    // prefs.commit();
     if (prefs.getString("user_token") != null) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (BuildContext context) => Home()),
@@ -138,6 +139,8 @@ class _Login extends State<Login> {
                                     "phone", jsonResponse['data']['phone']);
                                 prefs.setString(
                                     "user_id", jsonResponse['data']['user_id']);
+                                prefs.setString("is_superadmin",
+                                    jsonResponse['data']['is_superadmin']);
 
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => Home()));
