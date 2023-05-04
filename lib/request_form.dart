@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:persuratan/api/api_form.dart';
 import 'package:persuratan/api/api_jenis_peminjaman.dart';
+import 'package:persuratan/detail_form.dart';
 import 'package:persuratan/home.dart';
 import 'package:persuratan/login.dart';
 import 'package:persuratan/main.dart';
@@ -15,10 +16,15 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class RequestForm extends StatefulWidget {
+  final String permohonan_id;
   final String form_id;
   final String form;
 
-  const RequestForm({super.key, required this.form_id, required this.form});
+  const RequestForm(
+      {super.key,
+      required this.form_id,
+      required this.form,
+      this.permohonan_id = "0"});
 
   @override
   State<RequestForm> createState() => _RequestFormState();
@@ -48,6 +54,30 @@ class _RequestFormState extends State<RequestForm> {
     } else {
       selectedJenisPeminjaman = "0";
     }
+
+    getDataPermohonan(widget.permohonan_id);
+  }
+
+  getDataPermohonan(String _id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+    var api_url =
+        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+            user_token +
+            '&permohonan_id=' +
+            _id;
+    var response = await http.get(Uri.parse(api_url));
+    var jsonResponse = json.decode(response.body);
+
+    setState(() {
+      input_perihal.text = jsonResponse['data']['perihal'];
+      input_nrp.text = jsonResponse['data']['nrp'];
+      input_nama.text = jsonResponse['data']['nama'];
+      input_universitas.text = jsonResponse['data']['universitas'];
+      input_keterangan.text = jsonResponse['data']['keterangan'];
+      date_start.text = jsonResponse['data']['date_start'];
+      date_end.text = jsonResponse['data']['date_end'];
+    });
   }
 
   @override
@@ -311,6 +341,7 @@ class _RequestFormState extends State<RequestForm> {
                           var user_token = prefs.getString("user_token");
 
                           Map data = {
+                            'permohonan_id': widget.permohonan_id,
                             'form_id': widget.form_id,
                             'jenis_peminjaman_id': selectedJenisPeminjaman,
                             'perihal': input_perihal.text,
@@ -319,9 +350,10 @@ class _RequestFormState extends State<RequestForm> {
                             'universitas': input_universitas.text,
                             'keterangan': input_keterangan.text,
                             'date_start': date_start.text,
-                            'data_end': date_end.text,
+                            'date_end': date_end.text,
                             'status': 'draft'
                           };
+
                           var jsonResponse = null;
                           String api_url =
                               "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/createpermohonan?user_token=" +
@@ -330,14 +362,27 @@ class _RequestFormState extends State<RequestForm> {
                           var response =
                               await http.post(Uri.parse(api_url), body: data);
                           jsonResponse = json.decode(response.body);
+
                           if (jsonResponse['status'] == 200) {
-                            final snackbar = SnackBar(
-                                content: Text(
-                                    "Surat Permohonan telah berhasil dibuat"));
-                            _messangerKey.currentState!.showSnackBar(snackbar);
+                            if (widget.permohonan_id == "0") {
+                              final snackbar = SnackBar(
+                                  content: Text(
+                                      "Surat Permohonan telah berhasil dibuat"));
+                              _messangerKey.currentState!
+                                  .showSnackBar(snackbar);
+                            } else {
+                              final snackbar = SnackBar(
+                                  content: Text(
+                                      "Surat Permohonan telah berhasil diubah"));
+                              _messangerKey.currentState!
+                                  .showSnackBar(snackbar);
+                            }
 
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => Home()));
+                                builder: (context) => DetailForm(
+                                    permohonan_id: jsonResponse['data']
+                                        ['permohonan_id'],
+                                    status: jsonResponse['data']['status'])));
                           } else {
                             print(jsonResponse);
                             final snackbar =

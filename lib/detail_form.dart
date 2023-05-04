@@ -17,6 +17,7 @@ import 'package:persuratan/main.dart';
 import 'package:persuratan/model/form.dart';
 import 'package:persuratan/model/jenis_peminjaman.dart';
 import 'package:persuratan/model/permohonan.dart';
+import 'package:persuratan/request_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,10 +25,11 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:http/http.dart' as http;
 
 class DetailForm extends StatefulWidget {
-  final String form_id;
+  final String permohonan_id;
   final String status;
 
-  const DetailForm({super.key, required this.form_id, required this.status});
+  const DetailForm(
+      {super.key, required this.permohonan_id, required this.status});
 
   @override
   State<DetailForm> createState() => _DetailFormState();
@@ -47,7 +49,8 @@ class _DetailFormState extends State<DetailForm> {
     super.initState();
     checkIsSuperadmin();
 
-    detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+    detail_permohonan =
+        api_permohonan.getDetailPermohonan(widget.permohonan_id);
   }
 
   checkIsSuperadmin() async {
@@ -59,7 +62,8 @@ class _DetailFormState extends State<DetailForm> {
 
   reloadData() {
     setState(() {
-      detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+      detail_permohonan =
+          api_permohonan.getDetailPermohonan(widget.permohonan_id);
     });
   }
 
@@ -380,14 +384,42 @@ class _DetailFormState extends State<DetailForm> {
                   // SizedBox(
                   //   height: 10,
                   // ),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: ElevatedButton(
-                        onPressed: () {}, child: Text('Edit Form')),
+                  Visibility(
+                    visible: widget.status == 'Draft' ? true : false,
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            String user_token =
+                                await prefs.getString('user_token') ??
+                                    'unknown';
+
+                            final api_url =
+                                'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+                                    user_token +
+                                    '&permohonan_id=' +
+                                    widget.permohonan_id;
+                            final response = await http.get(Uri.parse(api_url));
+                            var jsonResponse = json.decode(response.body);
+                            // print(jsonResponse['data']['form']);
+
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => RequestForm(
+                                      form_id: jsonResponse['data']['form_id'],
+                                      form: jsonResponse['data']['form'],
+                                      permohonan_id: widget.permohonan_id,
+                                    )));
+                          },
+                          child: Text('Edit Form')),
+                    ),
                   ),
                   Visibility(
-                    visible: is_superadmin == "1" ? true : false,
+                    visible: is_superadmin == "1" && widget.status == 'Pending'
+                        ? true
+                        : false,
                     child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20),
                       child: Row(
@@ -416,7 +448,7 @@ class _DetailFormState extends State<DetailForm> {
                                     child: Text("Terima"),
                                     onPressed: () async {
                                       Map data = {
-                                        'permohonan_id': widget.form_id,
+                                        'permohonan_id': widget.permohonan_id,
                                         'status': 'approved'
                                       };
 
@@ -494,7 +526,7 @@ class _DetailFormState extends State<DetailForm> {
                                     child: Text("Tolak"),
                                     onPressed: () async {
                                       Map data = {
-                                        'permohonan_id': widget.form_id,
+                                        'permohonan_id': widget.permohonan_id,
                                         'status': 'rejected'
                                       };
 

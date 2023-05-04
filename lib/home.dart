@@ -41,7 +41,9 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     selectedFormLabel = 'Sakit';
-    listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
+    setState(() {
+      listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
+    });
     countNotif();
   }
 
@@ -313,7 +315,8 @@ class _HomeState extends State<Home> {
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => DetailForm(
-                                        form_id: api_data[index].permohonan_id,
+                                        permohonan_id:
+                                            api_data[index].permohonan_id,
                                         status: api_data[index].status,
                                       )));
                             },
