@@ -269,7 +269,7 @@ class _RequestFormState extends State<RequestForm> {
                           print(
                               pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
                           String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
+                              DateFormat('dd MMM yyyy').format(pickedDate);
                           print(
                               formattedDate); //formatted date output using intl package =>  2021-03-16
                           //you can implement different kind of Date Format here according to your requirement
@@ -307,7 +307,7 @@ class _RequestFormState extends State<RequestForm> {
                           print(
                               pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
                           String formattedDate =
-                              DateFormat('yyyy-MM-dd').format(pickedDate);
+                              DateFormat('dd MMM yyyy').format(pickedDate);
                           print(
                               formattedDate); //formatted date output using intl package =>  2021-03-16
                           //you can implement different kind of Date Format here according to your requirement
@@ -321,82 +321,112 @@ class _RequestFormState extends State<RequestForm> {
                         }
                       },
                     )),
-                Container(
-                    margin: EdgeInsets.only(top: 40),
-                    child: Material(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)),
-                      elevation: 10,
-                      clipBehavior: Clip.antiAlias,
-                      child: MaterialButton(
-                        minWidth: 200,
-                        height: 50,
-                        child: Text(
-                          'KIRIM',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        color: Color(0xff132137),
-                        onPressed: () async {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                Visibility(
+                  visible: true,
+                  child: Container(
+                    padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                            child: Container(
+                          padding: EdgeInsets.only(right: 5),
+                          child: ElevatedButton(
+                              // style: ElevatedButton.styleFrom(
+                              //     backgroundColor: Colors.green),
+                              onPressed: () {
+                                submitData('draft');
+                              },
+                              child: Text('DRAFT')),
+                        )),
+                        Expanded(
+                            child: Container(
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green),
+                              onPressed: () {
+                                submitData('pending');
+                              },
+                              child: Text('KIRIM')),
+                        ))
+                      ],
+                    ),
+                  ),
+                ),
+                // Container(
+                //     margin: EdgeInsets.only(top: 40),
+                //     child: Material(
+                //       shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(20.0)),
+                //       elevation: 10,
+                //       clipBehavior: Clip.antiAlias,
+                //       child: MaterialButton(
+                //         minWidth: 200,
+                //         height: 50,
+                //         child: Text(
+                //           'KIRIM',
+                //           style: TextStyle(color: Colors.white, fontSize: 20),
+                //         ),
+                //         color: Color(0xff132137),
+                //         onPressed: () async {
 
-                          var user_token = prefs.getString("user_token");
-
-                          Map data = {
-                            'permohonan_id': widget.permohonan_id,
-                            'form_id': widget.form_id,
-                            'jenis_peminjaman_id': selectedJenisPeminjaman,
-                            'perihal': input_perihal.text,
-                            'nrp': input_nrp.text,
-                            'nama': input_nama.text,
-                            'universitas': input_universitas.text,
-                            'keterangan': input_keterangan.text,
-                            'date_start': date_start.text,
-                            'date_end': date_end.text,
-                            'status': 'draft'
-                          };
-
-                          var jsonResponse = null;
-                          String api_url =
-                              "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/createpermohonan?user_token=" +
-                                  user_token!;
-
-                          var response =
-                              await http.post(Uri.parse(api_url), body: data);
-                          jsonResponse = json.decode(response.body);
-
-                          if (jsonResponse['status'] == 200) {
-                            if (widget.permohonan_id == "0") {
-                              final snackbar = SnackBar(
-                                  content: Text(
-                                      "Surat Permohonan telah berhasil dibuat"));
-                              _messangerKey.currentState!
-                                  .showSnackBar(snackbar);
-                            } else {
-                              final snackbar = SnackBar(
-                                  content: Text(
-                                      "Surat Permohonan telah berhasil diubah"));
-                              _messangerKey.currentState!
-                                  .showSnackBar(snackbar);
-                            }
-
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => DetailForm(
-                                    permohonan_id: jsonResponse['data']
-                                        ['permohonan_id'],
-                                    status: jsonResponse['data']['status'])));
-                          } else {
-                            print(jsonResponse);
-                            final snackbar =
-                                SnackBar(content: Text("Failed to load data"));
-                            _messangerKey.currentState!.showSnackBar(snackbar);
-                          }
-                        },
-                      ),
-                    ))
+                //         },
+                //       ),
+                //     ))
               ],
             ),
           )),
     );
+  }
+
+  submitData(String _status) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var user_token = prefs.getString("user_token");
+
+    Map data = {
+      'permohonan_id': widget.permohonan_id,
+      'form_id': widget.form_id,
+      'jenis_peminjaman_id': selectedJenisPeminjaman,
+      'perihal': input_perihal.text,
+      'nrp': input_nrp.text,
+      'nama': input_nama.text,
+      'universitas': input_universitas.text,
+      'keterangan': input_keterangan.text,
+      'date_start': date_start.text,
+      'date_end': date_end.text,
+      'status': _status
+    };
+
+    // print(data);
+
+    var jsonResponse = null;
+    String api_url =
+        "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/createpermohonan?user_token=" +
+            user_token!;
+
+    var response = await http.post(Uri.parse(api_url), body: data);
+    jsonResponse = json.decode(response.body);
+
+    if (jsonResponse['status'] == 200) {
+      if (widget.permohonan_id == "0") {
+        final snackbar =
+            SnackBar(content: Text("Surat Permohonan telah berhasil dibuat"));
+        _messangerKey.currentState!.showSnackBar(snackbar);
+      } else {
+        final snackbar =
+            SnackBar(content: Text("Surat Permohonan telah berhasil diubah"));
+        _messangerKey.currentState!.showSnackBar(snackbar);
+      }
+
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => DetailForm(
+              permohonan_id: jsonResponse['data']['permohonan_id'],
+              status: jsonResponse['data']['status'])));
+    } else {
+      print(jsonResponse);
+      final snackbar = SnackBar(content: Text("Failed to load data"));
+      _messangerKey.currentState!.showSnackBar(snackbar);
+    }
   }
 }

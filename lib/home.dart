@@ -323,13 +323,13 @@ class _HomeState extends State<Home> {
                         itemBuilder: (BuildContext context, int index) {
                           if (api_data[index].status == 'Pending') {
                             status_label_color = Colors.yellow;
-                            status_text_color = Colors.white;
+                            status_text_color = Colors.black;
                           } else if (api_data[index].status == 'Approved') {
                             status_label_color = Colors.green;
                             status_text_color = Colors.white;
                           } else if (api_data[index].status == 'Rejected') {
-                            status_label_color = Colors.yellow;
-                            status_text_color = Colors.black;
+                            status_label_color = Colors.red;
+                            status_text_color = Colors.white;
                           } else {
                             status_label_color = Colors.blue;
                             status_text_color = Colors.white;

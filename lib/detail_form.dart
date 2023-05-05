@@ -43,6 +43,8 @@ class _DetailFormState extends State<DetailForm> {
 
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   String is_superadmin = "0";
+  Color status_label_color = Colors.blue;
+  Color status_text_color = Colors.white;
 
   @override
   void initState() {
@@ -68,31 +70,6 @@ class _DetailFormState extends State<DetailForm> {
   }
 
   @override
-  // Widget build(BuildContext context) {
-  //   return MaterialApp(
-  //     scaffoldMessengerKey: _messangerKey,
-  //     home: Scaffold(
-  //       appBar: AppBar(
-  //         title: Text('Detail Form (' + widget.status + ')'),
-  //         leading: GestureDetector(
-  //           child: Icon(
-  //             Icons.arrow_back_ios,
-  //           ),
-  //           onTap: () {
-  //             Navigator.pop(context);
-  //           },
-  //         ),
-  //       ),
-  //       backgroundColor: Colors.grey.shade200,
-  //       body: Container(
-  //           child: SfPdfViewer.network(
-  //         'http://www.pdf995.com/samples/pdf.pdf',
-  //         key: _pdfViewerKey,
-  //       )),
-  //     ),
-  //   );
-  // }
-
   Widget build(BuildContext context) {
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
@@ -143,6 +120,21 @@ class _DetailFormState extends State<DetailForm> {
                               itemCount: api_data.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (BuildContext context, int index) {
+                                if (api_data[index].status == 'Pending') {
+                                  status_label_color = Colors.yellow;
+                                  status_text_color = Colors.black;
+                                } else if (api_data[index].status ==
+                                    'Approved') {
+                                  status_label_color = Colors.green;
+                                  status_text_color = Colors.white;
+                                } else if (api_data[index].status ==
+                                    'Rejected') {
+                                  status_label_color = Colors.red;
+                                  status_text_color = Colors.white;
+                                } else {
+                                  status_label_color = Colors.blue;
+                                  status_text_color = Colors.white;
+                                }
                                 return Container(
                                     padding: EdgeInsets.only(
                                         top: 10,
@@ -289,7 +281,7 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                             Container(
                                               decoration: BoxDecoration(
-                                                  color: Colors.red,
+                                                  color: status_label_color,
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
                                               padding: EdgeInsets.only(
@@ -301,7 +293,8 @@ class _DetailFormState extends State<DetailForm> {
                                                   api_data[index].status,
                                                   style: TextStyle(
                                                       fontSize: 16,
-                                                      color: Colors.white)),
+                                                      color:
+                                                          status_text_color)),
                                             ),
                                           ],
                                         ),
