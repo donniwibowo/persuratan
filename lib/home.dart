@@ -36,6 +36,8 @@ class _HomeState extends State<Home> {
   Widget customSearchBar = const Text('DMS | SUREL');
 
   int notif_ctr = 0;
+  Color status_label_color = Colors.blue;
+  Color status_text_color = Colors.white;
 
   @override
   void initState() {
@@ -319,6 +321,19 @@ class _HomeState extends State<Home> {
                         itemCount: api_data.length,
                         scrollDirection: Axis.vertical,
                         itemBuilder: (BuildContext context, int index) {
+                          if (api_data[index].status == 'Pending') {
+                            status_label_color = Colors.yellow;
+                            status_text_color = Colors.white;
+                          } else if (api_data[index].status == 'Approved') {
+                            status_label_color = Colors.green;
+                            status_text_color = Colors.white;
+                          } else if (api_data[index].status == 'Rejected') {
+                            status_label_color = Colors.yellow;
+                            status_text_color = Colors.black;
+                          } else {
+                            status_label_color = Colors.blue;
+                            status_text_color = Colors.white;
+                          }
                           return InkWell(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
@@ -507,7 +522,7 @@ class _HomeState extends State<Home> {
                                               Container(
                                                 // margin: EdgeInsets.only(left: 10),
                                                 decoration: BoxDecoration(
-                                                    color: Colors.red,
+                                                    color: status_label_color,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5)),
@@ -520,7 +535,7 @@ class _HomeState extends State<Home> {
                                                   api_data[index].status,
                                                   style: TextStyle(
                                                       fontSize: 15,
-                                                      color: Colors.white),
+                                                      color: status_text_color),
                                                 ),
                                               ),
                                             ],
@@ -528,11 +543,106 @@ class _HomeState extends State<Home> {
                                         ),
                                       ],
                                     ),
-                                    Container(
-                                      child: Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
+                                    Visibility(
+                                      visible: api_data[index].status == 'Draft'
+                                          ? true
+                                          : false,
+                                      child: Container(
+                                          child: IconButton(
+                                              onPressed: () {
+                                                Widget cancelButton =
+                                                    ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.white),
+                                                  child: Text(
+                                                    "Tutup",
+                                                    style: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context,
+                                                            rootNavigator: true)
+                                                        .pop();
+                                                  },
+                                                );
+                                                Widget continueButton =
+                                                    ElevatedButton(
+                                                  child: Text("Hapus"),
+                                                  onPressed: () async {
+                                                    Map data = {
+                                                      'permohonan_id':
+                                                          api_data[index]
+                                                              .permohonan_id,
+                                                    };
+                                                    SharedPreferences
+                                                        sharedPreferences =
+                                                        await SharedPreferences
+                                                            .getInstance();
+
+                                                    var user_token =
+                                                        sharedPreferences
+                                                            .getString(
+                                                                "user_token");
+
+                                                    var jsonResponse = null;
+                                                    String api_url =
+                                                        "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/deletedocument?user_token=" +
+                                                            user_token!;
+
+                                                    var response =
+                                                        await http.post(
+                                                            Uri.parse(api_url),
+                                                            body: data);
+
+                                                    jsonResponse = json
+                                                        .decode(response.body);
+                                                    print(jsonResponse);
+
+                                                    if (jsonResponse[
+                                                            'status'] ==
+                                                        200) {
+                                                      reloadData();
+
+                                                      Navigator.of(context,
+                                                              rootNavigator:
+                                                                  true)
+                                                          .pop();
+
+                                                      final snackbar = SnackBar(
+                                                          content: Text(
+                                                              "Dokumen permohonan telah dihapus"));
+                                                      _messangerKey
+                                                          .currentState!
+                                                          .showSnackBar(
+                                                              snackbar);
+                                                    } else {
+                                                      print(jsonResponse[
+                                                          'field_error']);
+                                                    }
+                                                  },
+                                                );
+                                                AlertDialog alert = AlertDialog(
+                                                  title: Text("Konfirmasi"),
+                                                  content: Text(
+                                                      "Apakah anda yakin untuk menghapus dokumen ini?"),
+                                                  actions: [
+                                                    cancelButton,
+                                                    continueButton,
+                                                  ],
+                                                );
+                                                // show the dialog
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return alert;
+                                                  },
+                                                );
+                                              },
+                                              color: Colors.red,
+                                              icon: Icon(Icons.delete))),
                                     )
                                   ],
                                 ),
