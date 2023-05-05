@@ -45,6 +45,7 @@ class _DetailFormState extends State<DetailForm> {
   String is_superadmin = "0";
   Color status_label_color = Colors.blue;
   Color status_text_color = Colors.white;
+  late String current_status;
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _DetailFormState extends State<DetailForm> {
 
     detail_permohonan =
         api_permohonan.getDetailPermohonan(widget.permohonan_id);
+    current_status = widget.status;
   }
 
   checkIsSuperadmin() async {
@@ -75,7 +77,7 @@ class _DetailFormState extends State<DetailForm> {
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
           appBar: AppBar(
-            title: Text('Detail Form (' + widget.status + ')'),
+            title: Text('Detail Form (' + current_status + ')'),
             leading: GestureDetector(
               child: Icon(
                 Icons.arrow_back_ios,
@@ -411,7 +413,7 @@ class _DetailFormState extends State<DetailForm> {
                     ),
                   ),
                   Visibility(
-                    visible: is_superadmin == "1" && widget.status == 'Pending'
+                    visible: is_superadmin == "1" && current_status == 'Pending'
                         ? true
                         : false,
                     child: Container(
@@ -463,6 +465,9 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
+                                        setState(() {
+                                          current_status = 'Approved';
+                                        });
                                         reloadData();
 
                                         Navigator.of(context,
@@ -541,6 +546,9 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
+                                        setState(() {
+                                          current_status = 'Rejected';
+                                        });
                                         reloadData();
 
                                         Navigator.of(context,
