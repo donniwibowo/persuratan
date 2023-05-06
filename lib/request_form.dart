@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:persuratan/api/api_form.dart';
 import 'package:persuratan/api/api_jenis_peminjaman.dart';
 import 'package:persuratan/detail_form.dart';
@@ -14,6 +17,9 @@ import 'package:persuratan/model/jenis_peminjaman.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:string_extensions/string_extensions.dart';
 
 class RequestForm extends StatefulWidget {
   final String permohonan_id;
@@ -42,6 +48,8 @@ class _RequestFormState extends State<RequestForm> {
   TextEditingController input_keterangan = TextEditingController();
 
   late String selectedJenisPeminjaman;
+  late String selectedJenisPeminjamanLabel;
+
   List<DropdownMenuItem<String>> jenisPeminjamanList = [];
   ApiJenisPeminjaman api_jenis_peminjaman = ApiJenisPeminjaman();
   bool isFormPeminjaman = false;
@@ -139,6 +147,8 @@ class _RequestFormState extends State<RequestForm> {
                             } else {
                               selectedJenisPeminjaman =
                                   api_data[0].jenis_peminjaman_id;
+                              selectedJenisPeminjamanLabel =
+                                  api_data[0].jenis_peminjaman;
                             }
 
                             return DecoratedBox(
@@ -162,6 +172,18 @@ class _RequestFormState extends State<RequestForm> {
                                             dropDownState(() {
                                               selectedJenisPeminjaman =
                                                   newValue!;
+
+                                              for (var i = 0;
+                                                  i < api_data.length;
+                                                  i++) {
+                                                if (selectedJenisPeminjaman ==
+                                                    api_data[i]
+                                                        .jenis_peminjaman_id) {
+                                                  selectedJenisPeminjamanLabel =
+                                                      api_data[i]
+                                                          .jenis_peminjaman;
+                                                }
+                                              }
                                             });
                                           });
                                         },
@@ -353,29 +375,117 @@ class _RequestFormState extends State<RequestForm> {
                     ),
                   ),
                 ),
-                // Container(
-                //     margin: EdgeInsets.only(top: 40),
-                //     child: Material(
-                //       shape: RoundedRectangleBorder(
-                //           borderRadius: BorderRadius.circular(20.0)),
-                //       elevation: 10,
-                //       clipBehavior: Clip.antiAlias,
-                //       child: MaterialButton(
-                //         minWidth: 200,
-                //         height: 50,
-                //         child: Text(
-                //           'KIRIM',
-                //           style: TextStyle(color: Colors.white, fontSize: 20),
-                //         ),
-                //         color: Color(0xff132137),
-                //         onPressed: () async {
-
-                //         },
-                //       ),
-                //     ))
               ],
             ),
           )),
+    );
+  }
+
+  Future<void> generatePDFFile(
+      String _permohonan_id, String _status, String pdf_filename) async {
+    final pdf = pw.Document();
+    pdf.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Container(
+                child: pw.Column(children: [
+              pw.Container(
+                  padding: pw.EdgeInsets.only(bottom: 20),
+                  decoration: pw.BoxDecoration(
+                      border: const pw.Border(
+                          bottom: pw.BorderSide(color: PdfColors.black))),
+                  child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                      children: [
+                        pw.Container(
+                            child: pw.Text('LOGO',
+                                style: pw.TextStyle(fontSize: 20))),
+                        pw.Container(
+                            padding: pw.EdgeInsets.only(left: 20),
+                            child: pw.Column(children: [
+                              pw.Text('PT. INTEGRA TEKNOLOGI SOLUSI'),
+                              pw.Text(
+                                  'Wisma Medokan Asri, Jl. Medokan Asri Utara XV No.10, Medokan Ayu'),
+                              pw.Text('Rungkut, Surabaya City, East Java 60295')
+                            ]))
+                      ])),
+              pw.SizedBox(height: 40),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("NRP")),
+                pw.Container(width: 150, child: pw.Text(input_nrp.text))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Nama")),
+                pw.Container(
+                    width: 150, child: pw.Text(input_nama.text.toUpperCase()))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Universitas")),
+                pw.Container(
+                    width: 150,
+                    child: pw.Text(input_universitas.text.toUpperCase()))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Perihal")),
+                pw.Container(width: 150, child: pw.Text(input_perihal.text))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Tanggal Mulai")),
+                pw.Container(width: 150, child: pw.Text(date_start.text))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Tanggal Berakhir")),
+                pw.Container(width: 150, child: pw.Text(date_end.text))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Status Permohonan")),
+                pw.Container(width: 150, child: pw.Text(_status.toUpperCase()))
+              ]),
+              pw.SizedBox(height: 30),
+              pw.Container(
+                  child: pw.Text(
+                      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.')),
+              pw.SizedBox(height: 40),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.end, children: [
+                pw.Column(children: [
+                  pw.Container(
+                      margin: pw.EdgeInsets.only(bottom: 10),
+                      child: pw.Text("Menyetujui,")),
+                  pw.Container(
+                      color: PdfColors.red,
+                      padding: pw.EdgeInsets.all(10),
+                      child: pw.Text(_status)),
+                  pw.Container(
+                      margin: pw.EdgeInsets.only(top: 10), child: pw.Text("-"))
+                ])
+              ]),
+            ])),
+          ); // Center
+        })); // Page
+
+    final directory = await getExternalStorageDirectory();
+    final file = File("${directory?.path}/" + pdf_filename);
+    print(directory?.path);
+    final pdfBytes = await pdf.save();
+    await file.writeAsBytes(pdfBytes.toList());
+
+    DocumentFileSavePlus().saveMultipleFiles(
+      dataList: [
+        pdfBytes,
+      ],
+      fileNameList: [
+        pdf_filename,
+      ],
+      mimeTypeList: [
+        pdf_filename,
+      ],
     );
   }
 
@@ -419,10 +529,15 @@ class _RequestFormState extends State<RequestForm> {
         _messangerKey.currentState!.showSnackBar(snackbar);
       }
 
+      generatePDFFile(jsonResponse['data']['permohonan_id'],
+          jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
+
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => DetailForm(
-              permohonan_id: jsonResponse['data']['permohonan_id'],
-              status: jsonResponse['data']['status'])));
+                permohonan_id: jsonResponse['data']['permohonan_id'],
+                status: jsonResponse['data']['status'],
+                has_edit_access: jsonResponse['data']['has_edit_access'],
+              )));
     } else {
       print(jsonResponse);
       final snackbar = SnackBar(content: Text("Failed to load data"));
