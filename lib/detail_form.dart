@@ -372,7 +372,7 @@ class _DetailFormState extends State<DetailForm> {
                           padding: EdgeInsets.all(20),
                           height: 500,
                           child: SfPdfViewer.network(
-                            'https://dms.tigajayabahankue.com/uploads/documents/11711734.pdf',
+                            'https://www.soundczech.cz/temp/lorem-ipsum.pdf',
                             key: _pdfViewerKey,
                           )),
                     ],
@@ -428,7 +428,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "https://192.168.1.25/leap_integra/master/dms/api/form/updatestatus?user_token=" +
                                               user_token!;
 
                                       var response = await http
@@ -506,7 +506,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "https://192.168.1.25/leap_integra/master/dms/api/form/updatestatus?user_token=" +
                                               user_token!;
 
                                       var response = await http

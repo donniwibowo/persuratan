@@ -33,7 +33,7 @@ class ApiPermohonan extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getpermohonan?user_token=' +
+        'https://192.168.1.25/leap_integra/master/dms/api/form/getpermohonan?user_token=' +
             user_token +
             '&search_keyword=' +
             keyword;
@@ -57,7 +57,7 @@ class ApiPermohonan extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonan?user_token=' +
+        'https://192.168.1.25/leap_integra/master/dms/api/form/getdetailpermohonan?user_token=' +
             user_token +
             '&permohonan_id=' +
             permohonan_id;
