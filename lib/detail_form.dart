@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:persuratan/api/api_form.dart';
 import 'package:persuratan/api/api_jenis_peminjaman.dart';
 import 'package:persuratan/api/api_permohonan.dart';
@@ -17,17 +19,25 @@ import 'package:persuratan/main.dart';
 import 'package:persuratan/model/form.dart';
 import 'package:persuratan/model/jenis_peminjaman.dart';
 import 'package:persuratan/model/permohonan.dart';
+import 'package:persuratan/request_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:http/http.dart' as http;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class DetailForm extends StatefulWidget {
-  final String form_id;
+  final String permohonan_id;
   final String status;
+  final String has_edit_access;
 
-  const DetailForm({super.key, required this.form_id, required this.status});
+  const DetailForm(
+      {super.key,
+      required this.permohonan_id,
+      required this.status,
+      this.has_edit_access = "0"});
 
   @override
   State<DetailForm> createState() => _DetailFormState();
@@ -41,13 +51,18 @@ class _DetailFormState extends State<DetailForm> {
 
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   String is_superadmin = "0";
+  Color status_label_color = Colors.blue;
+  Color status_text_color = Colors.white;
+  late String current_status;
 
   @override
   void initState() {
     super.initState();
     checkIsSuperadmin();
 
-    detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+    detail_permohonan =
+        api_permohonan.getDetailPermohonan(widget.permohonan_id);
+    current_status = widget.status;
   }
 
   checkIsSuperadmin() async {
@@ -59,48 +74,46 @@ class _DetailFormState extends State<DetailForm> {
 
   reloadData() {
     setState(() {
-      detail_permohonan = api_permohonan.getDetailPermohonan(widget.form_id);
+      detail_permohonan =
+          api_permohonan.getDetailPermohonan(widget.permohonan_id);
     });
   }
 
-  @override
-  // Widget build(BuildContext context) {
-  //   return MaterialApp(
-  //     scaffoldMessengerKey: _messangerKey,
-  //     home: Scaffold(
-  //       appBar: AppBar(
-  //         title: Text('Detail Form (' + widget.status + ')'),
-  //         leading: GestureDetector(
-  //           child: Icon(
-  //             Icons.arrow_back_ios,
-  //           ),
-  //           onTap: () {
-  //             Navigator.pop(context);
-  //           },
-  //         ),
-  //       ),
-  //       backgroundColor: Colors.grey.shade200,
-  //       body: Container(
-  //           child: SfPdfViewer.network(
-  //         'http://www.pdf995.com/samples/pdf.pdf',
-  //         key: _pdfViewerKey,
-  //       )),
-  //     ),
-  //   );
-  // }
+  Future<File> getLocalDirectory(String _permohonan_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+    var api_url =
+        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getpdffilename?user_token=' +
+            user_token +
+            '&permohonan_id=' +
+            _permohonan_id;
 
+    var response = await http.get(Uri.parse(api_url));
+    var jsonResponse = json.decode(response.body);
+    String pdf_filename = 'test_pdf3.pdf';
+    if (jsonResponse['data'] != null) {
+      pdf_filename = jsonResponse['data'];
+    }
+
+    final directory = await getExternalStorageDirectory();
+    final file = File("${directory?.path}/" + pdf_filename);
+    return file;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
           appBar: AppBar(
-            title: Text('Detail Form (' + widget.status + ')'),
+            title: Text('Detail Form (' + current_status + ')'),
             leading: GestureDetector(
               child: Icon(
                 Icons.arrow_back_ios,
               ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Home()));
               },
             ),
           ),
@@ -138,6 +151,22 @@ class _DetailFormState extends State<DetailForm> {
                               itemCount: api_data.length,
                               scrollDirection: Axis.vertical,
                               itemBuilder: (BuildContext context, int index) {
+                                if (api_data[index].status == 'Pending') {
+                                  status_label_color = Colors.yellow;
+                                  status_text_color = Colors.black;
+                                } else if (api_data[index].status ==
+                                    'Approved') {
+                                  status_label_color = Colors.green;
+                                  status_text_color = Colors.white;
+                                } else if (api_data[index].status ==
+                                    'Rejected') {
+                                  status_label_color = Colors.red;
+                                  status_text_color = Colors.white;
+                                } else {
+                                  status_label_color = Colors.blue;
+                                  status_text_color = Colors.white;
+                                }
+
                                 return Container(
                                     padding: EdgeInsets.only(
                                         top: 10,
@@ -270,7 +299,7 @@ class _DetailFormState extends State<DetailForm> {
                                           ],
                                         ),
                                         SizedBox(
-                                          height: 15,
+                                          height: 4,
                                         ),
                                         Row(
                                           children: [
@@ -284,7 +313,7 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                             Container(
                                               decoration: BoxDecoration(
-                                                  color: Colors.red,
+                                                  color: status_label_color,
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
                                               padding: EdgeInsets.only(
@@ -296,7 +325,29 @@ class _DetailFormState extends State<DetailForm> {
                                                   api_data[index].status,
                                                   style: TextStyle(
                                                       fontSize: 16,
-                                                      color: Colors.white)),
+                                                      color:
+                                                          status_text_color)),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 4,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              child: Text('Approval By',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors
+                                                          .grey.shade600)),
+                                            ),
+                                            Container(
+                                              child: Text(
+                                                  api_data[index].response_by,
+                                                  style:
+                                                      TextStyle(fontSize: 16)),
                                             ),
                                           ],
                                         ),
@@ -316,27 +367,6 @@ class _DetailFormState extends State<DetailForm> {
                                             Container(
                                               child: Text(
                                                   api_data[index].created_on,
-                                                  style:
-                                                      TextStyle(fontSize: 16)),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 4,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: 150,
-                                              child: Text('Tanggal Diubah',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors
-                                                          .grey.shade600)),
-                                            ),
-                                            Container(
-                                              child: Text(
-                                                  api_data[index].updated_on,
                                                   style:
                                                       TextStyle(fontSize: 16)),
                                             ),
@@ -368,26 +398,66 @@ class _DetailFormState extends State<DetailForm> {
                   ),
                   Stack(
                     children: [
-                      Container(
-                          padding: EdgeInsets.all(20),
-                          height: 500,
-                          child: SfPdfViewer.network(
-                            'https://www.soundczech.cz/temp/lorem-ipsum.pdf',
-                            key: _pdfViewerKey,
-                          )),
+                      FutureBuilder(
+                          future: getLocalDirectory(widget.permohonan_id),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final pdf_file = snapshot.data as File;
+                              return Container(
+                                  padding: EdgeInsets.all(20),
+                                  height: 500,
+                                  child: SfPdfViewer.file(
+                                    pdf_file,
+                                    key: _pdfViewerKey,
+                                  ));
+                            }
+
+                            return Container();
+                          })
                     ],
                   ),
                   // SizedBox(
                   //   height: 10,
                   // ),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: ElevatedButton(
-                        onPressed: () {}, child: Text('Edit Form')),
+                  Visibility(
+                    visible: widget.status == 'Draft' &&
+                            widget.has_edit_access == '1'
+                        ? true
+                        : false,
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            String user_token =
+                                await prefs.getString('user_token') ??
+                                    'unknown';
+
+                            final api_url =
+                                'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+                                    user_token +
+                                    '&permohonan_id=' +
+                                    widget.permohonan_id;
+                            final response = await http.get(Uri.parse(api_url));
+                            var jsonResponse = json.decode(response.body);
+                            // print(jsonResponse['data']['form']);
+
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => RequestForm(
+                                      form_id: jsonResponse['data']['form_id'],
+                                      form: jsonResponse['data']['form'],
+                                      permohonan_id: widget.permohonan_id,
+                                    )));
+                          },
+                          child: Text('Edit Form')),
+                    ),
                   ),
                   Visibility(
-                    visible: is_superadmin == "1" ? true : false,
+                    visible: is_superadmin == "1" && current_status == 'Pending'
+                        ? true
+                        : false,
                     child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20),
                       child: Row(
@@ -416,7 +486,7 @@ class _DetailFormState extends State<DetailForm> {
                                     child: Text("Terima"),
                                     onPressed: () async {
                                       Map data = {
-                                        'permohonan_id': widget.form_id,
+                                        'permohonan_id': widget.permohonan_id,
                                         'status': 'approved'
                                       };
 
@@ -437,6 +507,23 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
+                                        generatePDFFile(
+                                            jsonResponse['data']
+                                                ['permohonan_id'],
+                                            jsonResponse['data']['status'],
+                                            jsonResponse['data']
+                                                ['pdf_filename'],
+                                            jsonResponse['data']['nrp'],
+                                            jsonResponse['data']['nama'],
+                                            jsonResponse['data']['universitas'],
+                                            jsonResponse['data']['perihal'],
+                                            jsonResponse['data']['date_start'],
+                                            jsonResponse['data']['date_end'],
+                                            jsonResponse['data']
+                                                ['response_by']);
+                                        setState(() {
+                                          current_status = 'Approved';
+                                        });
                                         reloadData();
 
                                         Navigator.of(context,
@@ -494,7 +581,7 @@ class _DetailFormState extends State<DetailForm> {
                                     child: Text("Tolak"),
                                     onPressed: () async {
                                       Map data = {
-                                        'permohonan_id': widget.form_id,
+                                        'permohonan_id': widget.permohonan_id,
                                         'status': 'rejected'
                                       };
 
@@ -515,6 +602,24 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
+                                        generatePDFFile(
+                                            jsonResponse['data']
+                                                ['permohonan_id'],
+                                            jsonResponse['data']['status'],
+                                            jsonResponse['data']
+                                                ['pdf_filename'],
+                                            jsonResponse['data']['nrp'],
+                                            jsonResponse['data']['nama'],
+                                            jsonResponse['data']['universitas'],
+                                            jsonResponse['data']['perihal'],
+                                            jsonResponse['data']['date_start'],
+                                            jsonResponse['data']['date_end'],
+                                            jsonResponse['data']
+                                                ['response_by']);
+
+                                        setState(() {
+                                          current_status = 'Rejected';
+                                        });
                                         reloadData();
 
                                         Navigator.of(context,
@@ -561,6 +666,121 @@ class _DetailFormState extends State<DetailForm> {
               ),
             ),
           )),
+    );
+  }
+
+  Future<void> generatePDFFile(
+      String _permohonan_id,
+      String _status,
+      String pdf_filename,
+      String _nrp,
+      String _nama,
+      String _universitas,
+      String _perihal,
+      String _date_start,
+      String _date_end,
+      String _response_by) async {
+    final pdf = pw.Document();
+    pdf.addPage(pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Center(
+            child: pw.Container(
+                child: pw.Column(children: [
+              pw.Container(
+                  padding: pw.EdgeInsets.only(bottom: 20),
+                  decoration: pw.BoxDecoration(
+                      border: const pw.Border(
+                          bottom: pw.BorderSide(color: PdfColors.black))),
+                  child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                      children: [
+                        pw.Container(
+                            child: pw.Text('LOGO',
+                                style: pw.TextStyle(fontSize: 20))),
+                        pw.Container(
+                            padding: pw.EdgeInsets.only(left: 20),
+                            child: pw.Column(children: [
+                              pw.Text('PT. INTEGRA TEKNOLOGI SOLUSI'),
+                              pw.Text(
+                                  'Wisma Medokan Asri, Jl. Medokan Asri Utara XV No.10, Medokan Ayu'),
+                              pw.Text('Rungkut, Surabaya City, East Java 60295')
+                            ]))
+                      ])),
+              pw.SizedBox(height: 40),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("NRP")),
+                pw.Container(width: 150, child: pw.Text(_nrp))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Nama")),
+                pw.Container(width: 150, child: pw.Text(_nama))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Universitas")),
+                pw.Container(width: 150, child: pw.Text(_universitas))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Perihal")),
+                pw.Container(width: 150, child: pw.Text(_perihal))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Tanggal Mulai")),
+                pw.Container(width: 150, child: pw.Text(_date_start))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Tanggal Berakhir")),
+                pw.Container(width: 150, child: pw.Text(_date_end))
+              ]),
+              pw.SizedBox(height: 10),
+              pw.Row(children: [
+                pw.Container(width: 150, child: pw.Text("Status Permohonan")),
+                pw.Container(width: 150, child: pw.Text(_status.toUpperCase()))
+              ]),
+              pw.SizedBox(height: 30),
+              pw.Container(
+                  child: pw.Text(
+                      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.')),
+              pw.SizedBox(height: 40),
+              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.end, children: [
+                pw.Column(children: [
+                  pw.Container(
+                      margin: pw.EdgeInsets.only(bottom: 10),
+                      child: pw.Text("Menyetujui,")),
+                  pw.Container(
+                      color: PdfColors.red,
+                      padding: pw.EdgeInsets.all(10),
+                      child: pw.Text(_status)),
+                  pw.Container(
+                      margin: pw.EdgeInsets.only(top: 10),
+                      child: pw.Text(_response_by))
+                ])
+              ]),
+            ])),
+          ); // Center
+        })); // Page
+
+    final directory = await getExternalStorageDirectory();
+    final file = File("${directory?.path}/" + pdf_filename);
+
+    final pdfBytes = await pdf.save();
+    await file.writeAsBytes(pdfBytes.toList());
+
+    DocumentFileSavePlus().saveMultipleFiles(
+      dataList: [
+        pdfBytes,
+      ],
+      fileNameList: [
+        pdf_filename,
+      ],
+      mimeTypeList: [
+        pdf_filename,
+      ],
     );
   }
 }
