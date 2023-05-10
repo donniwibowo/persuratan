@@ -54,6 +54,7 @@ class _DetailFormState extends State<DetailForm> {
   Color status_label_color = Colors.blue;
   Color status_text_color = Colors.white;
   late String current_status;
+  TextEditingController input_alasan = TextEditingController();
 
   @override
   void initState() {
@@ -486,7 +487,8 @@ class _DetailFormState extends State<DetailForm> {
                                     onPressed: () async {
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
-                                        'status': 'approved'
+                                        'status': 'approved',
+                                        'alasan': '',
                                       };
 
                                       SharedPreferences sharedPreferences =
@@ -581,7 +583,8 @@ class _DetailFormState extends State<DetailForm> {
                                     onPressed: () async {
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
-                                        'status': 'rejected'
+                                        'status': 'rejected',
+                                        'alasan': input_alasan.text
                                       };
 
                                       SharedPreferences sharedPreferences =
@@ -637,8 +640,21 @@ class _DetailFormState extends State<DetailForm> {
                                   );
                                   AlertDialog alert = AlertDialog(
                                     title: Text("Konfirmasi"),
-                                    content: Text(
-                                        "Apakah anda yakin untuk menolak permohonan ini?"),
+                                    content: Container(
+                                      height: 100,
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                              "Apakah anda yakin untuk menolak permohonan ini?"),
+                                          TextField(
+                                            controller: input_alasan,
+                                            decoration: InputDecoration(
+                                              hintText: 'Alasan..',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     actions: [
                                       cancelButton,
                                       continueButton,

@@ -36,7 +36,8 @@ class ApiJenisPeminjaman extends ChangeNotifier {
         'http://192.168.1.66:8080/api/form/getalljenispeminjaman/' + user_token;
     final response = await http.get(Uri.parse(api_url));
 
-    if (response.statusCode == 200) {
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 200 && jsonResponse['data'] != null) {
       final result =
           json.decode(response.body)['data'].cast<Map<String, dynamic>>();
       _data = result
