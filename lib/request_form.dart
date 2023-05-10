@@ -71,11 +71,10 @@ class _RequestFormState extends State<RequestForm> {
   getDataPermohonan(String _id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
-            user_token +
-            '&permohonan_id=' +
-            _id;
+    var api_url = 'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+        user_token +
+        '/' +
+        _id;
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
 
@@ -505,15 +504,15 @@ class _RequestFormState extends State<RequestForm> {
       'keterangan': input_keterangan.text,
       'date_start': date_start.text,
       'date_end': date_end.text,
-      'status': _status
+      'status': _status,
+      'alasan': '',
     };
 
     // print(data);
 
     var jsonResponse = null;
     String api_url =
-        "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/createpermohonan?user_token=" +
-            user_token!;
+        "http://192.168.1.66:8080/api/form/createpermohonan/" + user_token!;
 
     var response = await http.post(Uri.parse(api_url), body: data);
     jsonResponse = json.decode(response.body);

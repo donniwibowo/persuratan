@@ -32,11 +32,10 @@ class ApiPermohonan extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getpermohonan?user_token=' +
-            user_token +
-            '&search_keyword=' +
-            keyword;
+    final api_url = 'http://192.168.1.66:8080/api/form/getallpermohonan/' +
+        user_token +
+        '/' +
+        keyword;
     final response = await http.get(Uri.parse(api_url));
 
     if (response.statusCode == 200) {
@@ -56,11 +55,10 @@ class ApiPermohonan extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonan?user_token=' +
-            user_token +
-            '&permohonan_id=' +
-            permohonan_id;
+    final api_url = 'http://192.168.1.66:8080/api/form/getpermohonan/' +
+        user_token +
+        '/' +
+        permohonan_id;
     final response = await http.get(Uri.parse(api_url));
     if (response.statusCode == 200) {
       final result =

@@ -82,11 +82,10 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getpdffilename?user_token=' +
-            user_token +
-            '&permohonan_id=' +
-            _permohonan_id;
+    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+        user_token +
+        '/' +
+        _permohonan_id;
 
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
@@ -436,9 +435,9 @@ class _DetailFormState extends State<DetailForm> {
                                     'unknown';
 
                             final api_url =
-                                'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+                                'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
                                     user_token +
-                                    '&permohonan_id=' +
+                                    '/' +
                                     widget.permohonan_id;
                             final response = await http.get(Uri.parse(api_url));
                             var jsonResponse = json.decode(response.body);
@@ -498,7 +497,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -593,7 +592,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http

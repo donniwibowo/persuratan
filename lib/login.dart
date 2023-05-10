@@ -122,15 +122,15 @@ class _Login extends State<Login> {
                             };
                             var jsonResponse = null;
                             var api_url =
-                                'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/user/login';
+                                'http://192.168.1.66:8080/api/user/login';
                             var response =
                                 await http.post(Uri.parse(api_url), body: data);
                             jsonResponse = json.decode(response.body);
 
                             if (response.statusCode == 200) {
                               if (jsonResponse != null) {
-                                prefs.setString(
-                                    "user_token", jsonResponse['user_token']);
+                                prefs.setString("user_token",
+                                    jsonResponse['data']['user_token']);
                                 prefs.setString(
                                     "email", jsonResponse['data']['email']);
                                 prefs.setString("fullname",

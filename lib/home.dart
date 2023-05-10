@@ -61,8 +61,7 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getnumberofnotif?user_token=' +
-            user_token;
+        'http://192.168.1.66:8080/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
