@@ -687,6 +687,39 @@ class _HomeState extends State<Home> {
                                                   )
                                                 ],
                                               ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    // height: 50,
+                                                    width: 300,
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            15, 10, 15, 10),
+                                                    decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade300,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text("Alasan"),
+                                                        SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        Text(api_data[index]
+                                                            .alasan)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                           Visibility(
@@ -742,7 +775,7 @@ class _HomeState extends State<Home> {
                                                           var jsonResponse =
                                                               null;
                                                           String api_url =
-                                                              "https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/deletedocument?user_token=" +
+                                                              "http://192.168.1.66:8080/api/form/deletepermohonan/" +
                                                                   user_token!;
 
                                                           var response =
