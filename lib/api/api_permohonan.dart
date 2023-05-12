@@ -71,4 +71,24 @@ class ApiPermohonan extends ChangeNotifier {
       throw Exception('Failed to load Data');
     }
   }
+
+  Future<List<PermohonanModel>> getUnreadPermohonan() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+
+    final api_url =
+        'http://192.168.1.66:8080/api/form/getunreadpermohonan/' + user_token;
+    final response = await http.get(Uri.parse(api_url));
+
+    if (response.statusCode == 200) {
+      final result =
+          json.decode(response.body)['data'].cast<Map<String, dynamic>>();
+      _data = result
+          .map<PermohonanModel>((json) => PermohonanModel.fromJson(json))
+          .toList();
+      return _data;
+    } else {
+      throw Exception('Failed to load Data');
+    }
+  }
 }

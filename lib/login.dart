@@ -24,8 +24,8 @@ class _Login extends State<Login> {
 
   isLogin() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //prefs.clear();
-    //prefs.commit();
+    // prefs.clear();
+    // prefs.commit();
     if (prefs.getString("user_token") != null) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (BuildContext context) => Home()),
