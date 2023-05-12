@@ -33,7 +33,7 @@ class ApiJenisPeminjaman extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'https://192.168.1.25/leap_integra/master/dms/api/form/getjenispeminjaman?user_token=' +
+        'https://192.168.1.28/leap_integra/master/dms/api/form/getjenispeminjaman?user_token=' +
             user_token;
     final response = await http.get(Uri.parse(api_url));
 

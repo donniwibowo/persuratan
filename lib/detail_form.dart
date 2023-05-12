@@ -83,7 +83,7 @@ class _DetailFormState extends State<DetailForm> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     var api_url =
-        'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getpdffilename?user_token=' +
+        'https://192.168.1.28/leap_integra/master/dms/api/form/getpdffilename?user_token=' +
             user_token +
             '&permohonan_id=' +
             _permohonan_id;
@@ -436,7 +436,7 @@ class _DetailFormState extends State<DetailForm> {
                                     'unknown';
 
                             final api_url =
-                                'https://192.168.1.66/leap_integra/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+                                'https://192.168.1.28/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
                                     user_token +
                                     '&permohonan_id=' +
                                     widget.permohonan_id;
@@ -498,7 +498,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.25/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "https://192.168.1.28/leap_integra/master/dms/api/form/updatestatus?user_token=" +
                                               user_token!;
 
                                       var response = await http
@@ -593,7 +593,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.25/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "https://192.168.1.28/leap_integra/master/dms/api/form/updatestatus?user_token=" +
                                               user_token!;
 
                                       var response = await http
