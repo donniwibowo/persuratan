@@ -14,6 +14,7 @@ import 'package:persuratan/login.dart';
 import 'package:persuratan/main.dart';
 import 'package:persuratan/model/form.dart';
 import 'package:persuratan/model/permohonan.dart';
+import 'package:persuratan/notification_page.dart';
 import 'package:persuratan/request_form.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -61,8 +62,7 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'https://192.168.1.28/leap_integra/master/dms/api/form/getnumberofnotif?user_token=' +
-            user_token;
+        'http://192.168.1.66:8080/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -77,107 +77,6 @@ class _HomeState extends State<Home> {
     setState(() {
       listPermohonan = api_permohonan.getAllPermohonan(input_search.text);
     });
-  }
-
-  Future<void> generatePDFFile() async {
-    final pdf = pw.Document();
-
-    pdf.addPage(pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Container(
-                child: pw.Column(children: [
-              pw.Container(
-                  padding: pw.EdgeInsets.only(bottom: 20),
-                  decoration: pw.BoxDecoration(
-                      border: const pw.Border(
-                          bottom: pw.BorderSide(color: PdfColors.black))),
-                  child: pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-                      children: [
-                        pw.Container(
-                            child: pw.Text('LOGO',
-                                style: pw.TextStyle(fontSize: 20))),
-                        pw.Container(
-                            padding: pw.EdgeInsets.only(left: 20),
-                            child: pw.Column(children: [
-                              pw.Text('PT. INTEGRA TEKNOLOGI SOLUSI'),
-                              pw.Text(
-                                  'Wisma Medokan Asri, Jl. Medokan Asri Utara XV No.10, Medokan Ayu'),
-                              pw.Text('Rungkut, Surabaya City, East Java 60295')
-                            ]))
-                      ])),
-              pw.SizedBox(height: 40),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("NRP")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 10),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("Nama")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 10),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("Universitas")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 10),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("Perihal")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 10),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("Tanggal Mulai")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 10),
-              pw.Row(children: [
-                pw.Container(width: 150, child: pw.Text("Tanggal Berakhir")),
-                pw.Container(width: 150, child: pw.Text("123243443434"))
-              ]),
-              pw.SizedBox(height: 30),
-              pw.Container(
-                  child: pw.Text(
-                      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.')),
-              pw.SizedBox(height: 40),
-              pw.Row(mainAxisAlignment: pw.MainAxisAlignment.end, children: [
-                pw.Column(children: [
-                  pw.Container(
-                      margin: pw.EdgeInsets.only(bottom: 10),
-                      child: pw.Text("Menyetujui")),
-                  pw.Container(
-                      color: PdfColors.red,
-                      padding: pw.EdgeInsets.all(10),
-                      child: pw.Text('Approved')),
-                  pw.Container(
-                      margin: pw.EdgeInsets.only(top: 10),
-                      child: pw.Text("Delvo Anderson"))
-                ])
-              ]),
-            ])),
-          ); // Center
-        })); // Page
-
-    final directory = await getExternalStorageDirectory();
-    final file = File("${directory?.path}/test_pdf3.pdf");
-    print(directory?.path);
-    final pdfBytes = await pdf.save();
-    await file.writeAsBytes(pdfBytes.toList());
-
-    DocumentFileSavePlus().saveMultipleFiles(
-      dataList: [
-        pdfBytes,
-      ],
-      fileNameList: [
-        "test_pdf3.pdf",
-      ],
-      mimeTypeList: [
-        "test_pdf2/pdf",
-      ],
-    );
   }
 
   @override
@@ -236,9 +135,11 @@ class _HomeState extends State<Home> {
                       padding: EdgeInsets.only(top: 8, right: 12),
                       icon: Icon(Icons.notifications),
                       onPressed: () {
-                        setState(() {
-                          notif_ctr = 0;
-                        });
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NotificatioPage()));
+                        // setState(() {
+                        //   notif_ctr = 0;
+                        // });
                       }),
                   notif_ctr != 0
                       ? new Positioned(
@@ -284,7 +185,6 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.grey.shade200,
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              // generatePDFFile();
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -688,6 +588,49 @@ class _HomeState extends State<Home> {
                                                   )
                                                 ],
                                               ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    api_data[index].alasan ==
+                                                                "" ||
+                                                            api_data[index]
+                                                                    .alasan ==
+                                                                "-"
+                                                        ? false
+                                                        : true,
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      // height: 50,
+                                                      width: 300,
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              15, 10, 15, 10),
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .grey.shade300,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5)),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text("Alasan"),
+                                                          SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Text(api_data[index]
+                                                              .alasan)
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                           Visibility(
@@ -743,7 +686,7 @@ class _HomeState extends State<Home> {
                                                           var jsonResponse =
                                                               null;
                                                           String api_url =
-                                                              "https://192.168.1.28/leap_integra/master/dms/api/form/deletedocument?user_token=" +
+                                                              "http://192.168.1.66:8080/api/form/deletepermohonan/" +
                                                                   user_token!;
 
                                                           var response =

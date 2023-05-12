@@ -54,6 +54,7 @@ class _DetailFormState extends State<DetailForm> {
   Color status_label_color = Colors.blue;
   Color status_text_color = Colors.white;
   late String current_status;
+  TextEditingController input_alasan = TextEditingController();
 
   @override
   void initState() {
@@ -82,11 +83,10 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url =
-        'https://192.168.1.28/leap_integra/master/dms/api/form/getpdffilename?user_token=' +
-            user_token +
-            '&permohonan_id=' +
-            _permohonan_id;
+    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+        user_token +
+        '/' +
+        _permohonan_id;
 
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
@@ -436,9 +436,9 @@ class _DetailFormState extends State<DetailForm> {
                                     'unknown';
 
                             final api_url =
-                                'https://192.168.1.28/leap_integra/master/dms/api/form/getdetailpermohonanforedit?user_token=' +
+                                'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
                                     user_token +
-                                    '&permohonan_id=' +
+                                    '/' +
                                     widget.permohonan_id;
                             final response = await http.get(Uri.parse(api_url));
                             var jsonResponse = json.decode(response.body);
@@ -487,7 +487,8 @@ class _DetailFormState extends State<DetailForm> {
                                     onPressed: () async {
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
-                                        'status': 'approved'
+                                        'status': 'approved',
+                                        'alasan': '',
                                       };
 
                                       SharedPreferences sharedPreferences =
@@ -498,7 +499,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.28/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -582,7 +583,8 @@ class _DetailFormState extends State<DetailForm> {
                                     onPressed: () async {
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
-                                        'status': 'rejected'
+                                        'status': 'rejected',
+                                        'alasan': input_alasan.text
                                       };
 
                                       SharedPreferences sharedPreferences =
@@ -593,7 +595,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://192.168.1.28/leap_integra/master/dms/api/form/updatestatus?user_token=" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -638,8 +640,21 @@ class _DetailFormState extends State<DetailForm> {
                                   );
                                   AlertDialog alert = AlertDialog(
                                     title: Text("Konfirmasi"),
-                                    content: Text(
-                                        "Apakah anda yakin untuk menolak permohonan ini?"),
+                                    content: Container(
+                                      height: 100,
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                              "Apakah anda yakin untuk menolak permohonan ini?"),
+                                          TextField(
+                                            controller: input_alasan,
+                                            decoration: InputDecoration(
+                                              hintText: 'Alasan..',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     actions: [
                                       cancelButton,
                                       continueButton,
