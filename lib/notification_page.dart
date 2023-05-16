@@ -107,6 +107,7 @@ class _NotificationState extends State<NotificatioPage> {
                                                   has_edit_access:
                                                       api_data[index]
                                                           .has_edit_access,
+                                                  markasread: "1",
                                                 )));
                                   },
                                   child: Container(

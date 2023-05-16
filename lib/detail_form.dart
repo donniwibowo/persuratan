@@ -32,12 +32,14 @@ class DetailForm extends StatefulWidget {
   final String permohonan_id;
   final String status;
   final String has_edit_access;
+  final String markasread;
 
   const DetailForm(
       {super.key,
       required this.permohonan_id,
       required this.status,
-      this.has_edit_access = "0"});
+      this.has_edit_access = "0",
+      this.markasread = "0"});
 
   @override
   State<DetailForm> createState() => _DetailFormState();
@@ -61,8 +63,8 @@ class _DetailFormState extends State<DetailForm> {
     super.initState();
     checkIsSuperadmin();
 
-    detail_permohonan =
-        api_permohonan.getDetailPermohonan(widget.permohonan_id);
+    detail_permohonan = api_permohonan.getDetailPermohonan(
+        widget.permohonan_id, widget.markasread);
     current_status = widget.status;
   }
 
@@ -75,8 +77,8 @@ class _DetailFormState extends State<DetailForm> {
 
   reloadData() {
     setState(() {
-      detail_permohonan =
-          api_permohonan.getDetailPermohonan(widget.permohonan_id);
+      detail_permohonan = api_permohonan.getDetailPermohonan(
+          widget.permohonan_id, widget.markasread);
     });
   }
 
