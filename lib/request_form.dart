@@ -508,8 +508,6 @@ class _RequestFormState extends State<RequestForm> {
       'alasan': '',
     };
 
-    // print(data);
-
     var jsonResponse = null;
     String api_url =
         "http://192.168.1.66:8080/api/form/createpermohonan/" + user_token!;
@@ -518,6 +516,13 @@ class _RequestFormState extends State<RequestForm> {
     jsonResponse = json.decode(response.body);
 
     if (jsonResponse['status'] == 200) {
+      String generate_pdf_url =
+          "http://192.168.1.66:8080/api/form/generatepdf/" +
+              user_token +
+              "/" +
+              jsonResponse['data']['permohonan_id'];
+      var response_pdf = await http.get(Uri.parse(generate_pdf_url));
+
       if (widget.permohonan_id == "0") {
         final snackbar =
             SnackBar(content: Text("Surat Permohonan telah berhasil dibuat"));
@@ -528,8 +533,8 @@ class _RequestFormState extends State<RequestForm> {
         _messangerKey.currentState!.showSnackBar(snackbar);
       }
 
-      generatePDFFile(jsonResponse['data']['permohonan_id'],
-          jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
+      // generatePDFFile(jsonResponse['data']['permohonan_id'],
+      //     jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => DetailForm(
