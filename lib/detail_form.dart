@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:persuratan/api/api_form.dart';
@@ -417,6 +418,50 @@ class _DetailFormState extends State<DetailForm> {
                               bottom: BorderSide(color: Colors.grey.shade400))),
                     ),
                   ),
+                  Container(
+                    child: FutureBuilder(
+                        future: getPDF(widget.permohonan_id),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            String pdf_file = snapshot.data as String;
+                            return Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.only(
+                                left: 15,
+                                right: 15,
+                                top: 10,
+                              ),
+                              child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.lightBlue),
+                                  onPressed: () {
+                                    FileDownloader.downloadFile(
+                                        url: pdf_file,
+                                        onProgress: (name, progress) {
+                                          print(progress);
+                                          final snackbar = SnackBar(
+                                              content: Text("Downloading..."));
+                                          _messangerKey.currentState!
+                                              .showSnackBar(snackbar);
+                                        },
+                                        onDownloadCompleted: (value) {
+                                          print("Downloaded!");
+                                          final snackbar = SnackBar(
+                                              content: Text(
+                                                  "Dokumen berhasil didownload"));
+                                          _messangerKey.currentState!
+                                              .showSnackBar(snackbar);
+                                        });
+                                  },
+                                  icon: Icon(Icons.download),
+                                  label: Text("Unduh Dokumen")),
+                            );
+                          }
+
+                          return Container();
+                        }),
+                  ),
+
                   Stack(
                     children: [
                       FutureBuilder(
