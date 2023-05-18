@@ -52,16 +52,16 @@ class _RequestFormState extends State<RequestForm> {
 
   List<DropdownMenuItem<String>> jenisPeminjamanList = [];
   ApiJenisPeminjaman api_jenis_peminjaman = ApiJenisPeminjaman();
-  bool isFormPeminjaman = false;
+  bool isFormPeminjaman = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.form == 'Peminjaman') {
-      isFormPeminjaman = true;
-    } else {
-      selectedJenisPeminjaman = "0";
-    }
+    // if (widget.form == 'Peminjaman') {
+    //   isFormPeminjaman = true;
+    // } else {
+    //   selectedJenisPeminjaman = "0";
+    // }
 
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
@@ -120,7 +120,8 @@ class _RequestFormState extends State<RequestForm> {
                     padding: EdgeInsets.only(left: 20, right: 20),
                     margin: EdgeInsets.only(bottom: 10),
                     child: FutureBuilder<List<JenisPeminjamanModel>>(
-                        future: api_jenis_peminjaman.getJenisPeminjaman(),
+                        future: api_jenis_peminjaman
+                            .getJenisPeminjaman(widget.form_id),
                         builder: (BuildContext context, snapshot) {
                           if (snapshot.hasData) {
                             List<JenisPeminjamanModel>? api_data =
@@ -134,15 +135,7 @@ class _RequestFormState extends State<RequestForm> {
                                 .toList();
 
                             if (api_data.length < 1) {
-                              return Padding(
-                                padding: EdgeInsets.only(left: 8),
-                                child: Text(
-                                  "Tidak ada data",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600),
-                                ),
-                              );
+                              return Container();
                             } else {
                               selectedJenisPeminjaman =
                                   api_data[0].jenis_peminjaman_id;
