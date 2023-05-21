@@ -62,7 +62,7 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'http://192.168.1.66:8080/api/form/countnotif/' + user_token;
+        'http://192.168.1.27:8080/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -135,8 +135,11 @@ class _HomeState extends State<Home> {
                       padding: EdgeInsets.only(top: 8, right: 12),
                       icon: Icon(Icons.notifications),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => NotificatioPage()));
+                        if (notif_ctr > 0) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NotificatioPage()));
+                        }
+
                         // setState(() {
                         //   notif_ctr = 0;
                         // });
@@ -686,7 +689,7 @@ class _HomeState extends State<Home> {
                                                           var jsonResponse =
                                                               null;
                                                           String api_url =
-                                                              "http://192.168.1.66:8080/api/form/deletepermohonan/" +
+                                                              "http://192.168.1.27:8080/api/form/deletepermohonan/" +
                                                                   user_token!;
 
                                                           var response =

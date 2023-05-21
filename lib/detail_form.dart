@@ -83,7 +83,7 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+    var api_url = 'http://192.168.1.27:8080/api/form/getpdffilename/' +
         user_token +
         '/' +
         _permohonan_id;
@@ -436,7 +436,7 @@ class _DetailFormState extends State<DetailForm> {
                                     'unknown';
 
                             final api_url =
-                                'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+                                'http://192.168.1.27:8080/api/form/getpermohonanforedit/' +
                                     user_token +
                                     '/' +
                                     widget.permohonan_id;
@@ -499,7 +499,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.27:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -595,7 +595,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.27:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http

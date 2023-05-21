@@ -33,7 +33,7 @@ class ApiJenisPeminjaman extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'http://192.168.1.66:8080/api/form/getalljenispeminjaman/' + user_token;
+        'http://192.168.1.27:8080/api/form/getalljenispeminjaman/' + user_token;
     final response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
