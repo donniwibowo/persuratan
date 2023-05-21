@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:persuratan/api/api_form.dart';
@@ -32,12 +33,14 @@ class DetailForm extends StatefulWidget {
   final String permohonan_id;
   final String status;
   final String has_edit_access;
+  final String markasread;
 
   const DetailForm(
       {super.key,
       required this.permohonan_id,
       required this.status,
-      this.has_edit_access = "0"});
+      this.has_edit_access = "0",
+      this.markasread = "0"});
 
   @override
   State<DetailForm> createState() => _DetailFormState();
@@ -61,8 +64,8 @@ class _DetailFormState extends State<DetailForm> {
     super.initState();
     checkIsSuperadmin();
 
-    detail_permohonan =
-        api_permohonan.getDetailPermohonan(widget.permohonan_id);
+    detail_permohonan = api_permohonan.getDetailPermohonan(
+        widget.permohonan_id, widget.markasread);
     current_status = widget.status;
   }
 
@@ -75,8 +78,8 @@ class _DetailFormState extends State<DetailForm> {
 
   reloadData() {
     setState(() {
-      detail_permohonan =
-          api_permohonan.getDetailPermohonan(widget.permohonan_id);
+      detail_permohonan = api_permohonan.getDetailPermohonan(
+          widget.permohonan_id, widget.markasread);
     });
   }
 
@@ -98,6 +101,25 @@ class _DetailFormState extends State<DetailForm> {
     final directory = await getExternalStorageDirectory();
     final file = File("${directory?.path}/" + pdf_filename);
     return file;
+  }
+
+  Future<String> getPDF(String _permohonan_id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+        user_token +
+        '/' +
+        _permohonan_id;
+
+    var response = await http.get(Uri.parse(api_url));
+    var jsonResponse = json.decode(response.body);
+    String pdf_filename = '';
+    if (jsonResponse['data'] != null) {
+      pdf_filename =
+          'http://192.168.1.66:8080/documents/' + jsonResponse['data'];
+    }
+
+    return pdf_filename;
   }
 
   @override
@@ -249,6 +271,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
+                                              width: 200,
                                               child: Text(
                                                   api_data[index].perihal,
                                                   style:
@@ -396,17 +419,61 @@ class _DetailFormState extends State<DetailForm> {
                               bottom: BorderSide(color: Colors.grey.shade400))),
                     ),
                   ),
+                  Container(
+                    child: FutureBuilder(
+                        future: getPDF(widget.permohonan_id),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            String pdf_file = snapshot.data as String;
+                            return Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.only(
+                                left: 15,
+                                right: 15,
+                                top: 10,
+                              ),
+                              child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.lightBlue),
+                                  onPressed: () {
+                                    FileDownloader.downloadFile(
+                                        url: pdf_file,
+                                        onProgress: (name, progress) {
+                                          print(progress);
+                                          final snackbar = SnackBar(
+                                              content: Text("Downloading..."));
+                                          _messangerKey.currentState!
+                                              .showSnackBar(snackbar);
+                                        },
+                                        onDownloadCompleted: (value) {
+                                          print("Downloaded!");
+                                          final snackbar = SnackBar(
+                                              content: Text(
+                                                  "Dokumen berhasil didownload"));
+                                          _messangerKey.currentState!
+                                              .showSnackBar(snackbar);
+                                        });
+                                  },
+                                  icon: Icon(Icons.download),
+                                  label: Text("Unduh Dokumen")),
+                            );
+                          }
+
+                          return Container();
+                        }),
+                  ),
+
                   Stack(
                     children: [
                       FutureBuilder(
-                          future: getLocalDirectory(widget.permohonan_id),
+                          future: getPDF(widget.permohonan_id),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
-                              final pdf_file = snapshot.data as File;
+                              String pdf_file = snapshot.data as String;
                               return Container(
                                   padding: EdgeInsets.all(20),
                                   height: 500,
-                                  child: SfPdfViewer.file(
+                                  child: SfPdfViewer.network(
                                     pdf_file,
                                     key: _pdfViewerKey,
                                   ));
@@ -416,8 +483,39 @@ class _DetailFormState extends State<DetailForm> {
                           })
                     ],
                   ),
+                  // Stack(
+                  //   children: [
+                  //     FutureBuilder(
+                  //         future: getLocalDirectory(widget.permohonan_id),
+                  //         builder: (context, snapshot) {
+                  //           if (snapshot.hasData) {
+                  //             final pdf_file = snapshot.data as File;
+                  //             return Container(
+                  //                 padding: EdgeInsets.all(20),
+                  //                 height: 500,
+                  //                 child: SfPdfViewer.file(
+                  //                   pdf_file,
+                  //                   key: _pdfViewerKey,
+                  //                 ));
+                  //           }
+
+                  //           return Container();
+                  //         })
+                  //   ],
+                  // ),
                   // SizedBox(
                   //   height: 10,
+                  // ),
+                  // Stack(
+                  //   children: [
+                  //     Container(
+                  //         padding: EdgeInsets.all(20),
+                  //         height: 500,
+                  //         child: SfPdfViewer.network(
+                  //           'http://192.168.1.66:8080/documents/report2.pdf',
+                  //           key: _pdfViewerKey,
+                  //         )),
+                  //   ],
                   // ),
                   Visibility(
                     visible: widget.status == 'Draft' &&
@@ -508,20 +606,28 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
-                                        generatePDFFile(
-                                            jsonResponse['data']
-                                                ['permohonan_id'],
-                                            jsonResponse['data']['status'],
-                                            jsonResponse['data']
-                                                ['pdf_filename'],
-                                            jsonResponse['data']['nrp'],
-                                            jsonResponse['data']['nama'],
-                                            jsonResponse['data']['universitas'],
-                                            jsonResponse['data']['perihal'],
-                                            jsonResponse['data']['date_start'],
-                                            jsonResponse['data']['date_end'],
-                                            jsonResponse['data']
-                                                ['response_by']);
+                                        String generate_pdf_url =
+                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                                user_token +
+                                                "/" +
+                                                widget.permohonan_id;
+                                        var response_pdf = await http
+                                            .get(Uri.parse(generate_pdf_url));
+
+                                        // generatePDFFile(
+                                        //     jsonResponse['data']
+                                        //         ['permohonan_id'],
+                                        //     jsonResponse['data']['status'],
+                                        //     jsonResponse['data']
+                                        //         ['pdf_filename'],
+                                        //     jsonResponse['data']['nrp'],
+                                        //     jsonResponse['data']['nama'],
+                                        //     jsonResponse['data']['universitas'],
+                                        //     jsonResponse['data']['perihal'],
+                                        //     jsonResponse['data']['date_start'],
+                                        //     jsonResponse['data']['date_end'],
+                                        //     jsonResponse['data']
+                                        //         ['response_by']);
                                         setState(() {
                                           current_status = 'Approved';
                                         });
@@ -604,20 +710,27 @@ class _DetailFormState extends State<DetailForm> {
                                       jsonResponse = json.decode(response.body);
 
                                       if (jsonResponse['status'] == 200) {
-                                        generatePDFFile(
-                                            jsonResponse['data']
-                                                ['permohonan_id'],
-                                            jsonResponse['data']['status'],
-                                            jsonResponse['data']
-                                                ['pdf_filename'],
-                                            jsonResponse['data']['nrp'],
-                                            jsonResponse['data']['nama'],
-                                            jsonResponse['data']['universitas'],
-                                            jsonResponse['data']['perihal'],
-                                            jsonResponse['data']['date_start'],
-                                            jsonResponse['data']['date_end'],
-                                            jsonResponse['data']
-                                                ['response_by']);
+                                        String generate_pdf_url =
+                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                                user_token +
+                                                "/" +
+                                                widget.permohonan_id;
+                                        var response_pdf = await http
+                                            .get(Uri.parse(generate_pdf_url));
+                                        // generatePDFFile(
+                                        //     jsonResponse['data']
+                                        //         ['permohonan_id'],
+                                        //     jsonResponse['data']['status'],
+                                        //     jsonResponse['data']
+                                        //         ['pdf_filename'],
+                                        //     jsonResponse['data']['nrp'],
+                                        //     jsonResponse['data']['nama'],
+                                        //     jsonResponse['data']['universitas'],
+                                        //     jsonResponse['data']['perihal'],
+                                        //     jsonResponse['data']['date_start'],
+                                        //     jsonResponse['data']['date_end'],
+                                        //     jsonResponse['data']
+                                        //         ['response_by']);
 
                                         setState(() {
                                           current_status = 'Rejected';

@@ -18,6 +18,7 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^21.1.41
   document_file_save_plus: ^2.0.0
   string_extensions: ^0.6.6
+  flutter_file_downloader: ^1.1.0+1
 
 dev_dependencies:
   flutter_test:

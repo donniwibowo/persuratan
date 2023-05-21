@@ -52,16 +52,16 @@ class _RequestFormState extends State<RequestForm> {
 
   List<DropdownMenuItem<String>> jenisPeminjamanList = [];
   ApiJenisPeminjaman api_jenis_peminjaman = ApiJenisPeminjaman();
-  bool isFormPeminjaman = false;
+  bool isFormPeminjaman = true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.form == 'Peminjaman') {
-      isFormPeminjaman = true;
-    } else {
-      selectedJenisPeminjaman = "0";
-    }
+    // if (widget.form == 'Peminjaman') {
+    //   isFormPeminjaman = true;
+    // } else {
+    //   selectedJenisPeminjaman = "0";
+    // }
 
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
@@ -120,7 +120,8 @@ class _RequestFormState extends State<RequestForm> {
                     padding: EdgeInsets.only(left: 20, right: 20),
                     margin: EdgeInsets.only(bottom: 10),
                     child: FutureBuilder<List<JenisPeminjamanModel>>(
-                        future: api_jenis_peminjaman.getJenisPeminjaman(),
+                        future: api_jenis_peminjaman
+                            .getJenisPeminjaman(widget.form_id),
                         builder: (BuildContext context, snapshot) {
                           if (snapshot.hasData) {
                             List<JenisPeminjamanModel>? api_data =
@@ -134,15 +135,7 @@ class _RequestFormState extends State<RequestForm> {
                                 .toList();
 
                             if (api_data.length < 1) {
-                              return Padding(
-                                padding: EdgeInsets.only(left: 8),
-                                child: Text(
-                                  "Tidak ada data",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600),
-                                ),
-                              );
+                              return Container();
                             } else {
                               selectedJenisPeminjaman =
                                   api_data[0].jenis_peminjaman_id;
@@ -508,8 +501,6 @@ class _RequestFormState extends State<RequestForm> {
       'alasan': '',
     };
 
-    // print(data);
-
     var jsonResponse = null;
     String api_url =
         "http://192.168.1.27:8080/api/form/createpermohonan/" + user_token!;
@@ -518,6 +509,13 @@ class _RequestFormState extends State<RequestForm> {
     jsonResponse = json.decode(response.body);
 
     if (jsonResponse['status'] == 200) {
+      String generate_pdf_url =
+          "http://192.168.1.66:8080/api/form/generatepdf/" +
+              user_token +
+              "/" +
+              jsonResponse['data']['permohonan_id'];
+      var response_pdf = await http.get(Uri.parse(generate_pdf_url));
+
       if (widget.permohonan_id == "0") {
         final snackbar =
             SnackBar(content: Text("Surat Permohonan telah berhasil dibuat"));
@@ -528,8 +526,8 @@ class _RequestFormState extends State<RequestForm> {
         _messangerKey.currentState!.showSnackBar(snackbar);
       }
 
-      generatePDFFile(jsonResponse['data']['permohonan_id'],
-          jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
+      // generatePDFFile(jsonResponse['data']['permohonan_id'],
+      //     jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => DetailForm(

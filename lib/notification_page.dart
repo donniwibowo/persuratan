@@ -107,6 +107,7 @@ class _NotificationState extends State<NotificatioPage> {
                                                   has_edit_access:
                                                       api_data[index]
                                                           .has_edit_access,
+                                                  markasread: "1",
                                                 )));
                                   },
                                   child: Container(
@@ -133,21 +134,14 @@ class _NotificationState extends State<NotificatioPage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
-                                                  api_data[index].perihal,
-                                                  style:
-                                                      TextStyle(fontSize: 18),
+                                                Container(
+                                                  width: 300,
+                                                  child: Text(
+                                                    api_data[index].perihal,
+                                                    style:
+                                                        TextStyle(fontSize: 18),
+                                                  ),
                                                 ),
-                                                Text(
-                                                  "(" +
-                                                      api_data[index]
-                                                          .date_start +
-                                                      " - " +
-                                                      api_data[index].date_end +
-                                                      ")",
-                                                  style:
-                                                      TextStyle(fontSize: 14),
-                                                )
                                               ],
                                             ),
                                             SizedBox(
@@ -168,6 +162,23 @@ class _NotificationState extends State<NotificatioPage> {
                                                     )),
                                               ],
                                             ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "(" +
+                                                      api_data[index]
+                                                          .date_start +
+                                                      " - " +
+                                                      api_data[index].date_end +
+                                                      ")",
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                )
+                                              ],
+                                            )
                                           ],
                                         )),
                                   ),

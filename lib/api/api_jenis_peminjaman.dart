@@ -28,23 +28,29 @@ class ApiJenisPeminjaman extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<JenisPeminjamanModel>> getJenisPeminjaman() async {
+  Future<List<JenisPeminjamanModel>> getJenisPeminjaman(String _form_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url =
-        'http://192.168.1.27:8080/api/form/getalljenispeminjaman/' + user_token;
+    final api_url = 'http://192.168.1.66:8080/api/form/getalljenispeminjaman/' +
+        user_token +
+        '/' +
+        _form_id;
     final response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
-    if (jsonResponse['status'] == 200 && jsonResponse['data'] != null) {
-      final result =
-          json.decode(response.body)['data'].cast<Map<String, dynamic>>();
-      _data = result
-          .map<JenisPeminjamanModel>(
-              (json) => JenisPeminjamanModel.fromJson(json))
-          .toList();
-      return _data;
+    if (jsonResponse['status'] == 200) {
+      if (jsonResponse['data'] == null) {
+        return _data;
+      } else {
+        final result =
+            json.decode(response.body)['data'].cast<Map<String, dynamic>>();
+        _data = result
+            .map<JenisPeminjamanModel>(
+                (json) => JenisPeminjamanModel.fromJson(json))
+            .toList();
+        return _data;
+      }
     } else {
       throw Exception('Failed to load Data');
     }
