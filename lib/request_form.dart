@@ -62,16 +62,20 @@ class _RequestFormState extends State<RequestForm> {
     // } else {
     //   selectedJenisPeminjaman = "0";
     // }
-
+    selectedJenisPeminjaman = "0";
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
     }
+
+    setState(() {
+      input_perihal.text = widget.form;
+    });
   }
 
   getDataPermohonan(String _id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.17:8080/api/form/getpermohonanforedit/' +
+    var api_url = 'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
         user_token +
         '/' +
         _id;
@@ -349,9 +353,10 @@ class _RequestFormState extends State<RequestForm> {
                               // style: ElevatedButton.styleFrom(
                               //     backgroundColor: Colors.green),
                               onPressed: () {
-                                submitData('draft');
+                                Navigator.pop(context);
+                                // submitData('draft');
                               },
-                              child: Text('DRAFT')),
+                              child: Text('BATAL')),
                         )),
                         Expanded(
                             child: Container(
@@ -359,9 +364,10 @@ class _RequestFormState extends State<RequestForm> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green),
                               onPressed: () {
-                                submitData('pending');
+                                // submitData('pending');
+                                submitData('draft');
                               },
-                              child: Text('KIRIM')),
+                              child: Text('DRAFT')),
                         ))
                       ],
                     ),
@@ -503,14 +509,14 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://192.168.1.17:8080/api/form/createpermohonan/" + user_token!;
+        "http://192.168.1.66:8080/api/form/createpermohonan/" + user_token!;
 
     var response = await http.post(Uri.parse(api_url), body: data);
     jsonResponse = json.decode(response.body);
 
     if (jsonResponse['status'] == 200) {
       String generate_pdf_url =
-          "http://192.168.1.17:8080/api/form/generatepdf/" +
+          "http://192.168.1.66:8080/api/form/generatepdf/" +
               user_token +
               "/" +
               jsonResponse['data']['permohonan_id'];

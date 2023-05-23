@@ -86,7 +86,7 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.17:8080/api/form/getpdffilename/' +
+    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
         user_token +
         '/' +
         _permohonan_id;
@@ -106,7 +106,7 @@ class _DetailFormState extends State<DetailForm> {
   Future<String> getPDF(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.17:8080/api/form/getpdffilename/' +
+    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
         user_token +
         '/' +
         _permohonan_id;
@@ -116,7 +116,7 @@ class _DetailFormState extends State<DetailForm> {
     String pdf_filename = '';
     if (jsonResponse['data'] != null) {
       pdf_filename =
-          'http://192.168.1.17:8080/documents/' + jsonResponse['data'];
+          'http://192.168.1.66:8080/documents/' + jsonResponse['data'];
     }
 
     return pdf_filename;
@@ -512,7 +512,7 @@ class _DetailFormState extends State<DetailForm> {
                   //         padding: EdgeInsets.all(20),
                   //         height: 500,
                   //         child: SfPdfViewer.network(
-                  //           'http://192.168.1.17:8080/documents/report2.pdf',
+                  //           'http://192.168.1.66:8080/documents/report2.pdf',
                   //           key: _pdfViewerKey,
                   //         )),
                   //   ],
@@ -523,33 +523,101 @@ class _DetailFormState extends State<DetailForm> {
                         ? true
                         : false,
                     child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      child: ElevatedButton(
-                          onPressed: () async {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            String user_token =
-                                await prefs.getString('user_token') ??
-                                    'unknown';
+                      padding: EdgeInsets.only(top: 5, left: 20, right: 20),
+                      child: Row(
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                              child: Container(
+                            padding: EdgeInsets.only(right: 5),
+                            child: ElevatedButton(
+                                onPressed: () async {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  String user_token =
+                                      await prefs.getString('user_token') ??
+                                          'unknown';
 
-                            final api_url =
-                                'http://192.168.1.17:8080/api/form/getpermohonanforedit/' +
-                                    user_token +
-                                    '/' +
-                                    widget.permohonan_id;
-                            final response = await http.get(Uri.parse(api_url));
-                            var jsonResponse = json.decode(response.body);
-                            // print(jsonResponse['data']['form']);
+                                  final api_url =
+                                      'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+                                          user_token +
+                                          '/' +
+                                          widget.permohonan_id;
+                                  final response =
+                                      await http.get(Uri.parse(api_url));
+                                  var jsonResponse = json.decode(response.body);
+                                  // print(jsonResponse['data']['form']);
 
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => RequestForm(
-                                      form_id: jsonResponse['data']['form_id'],
-                                      form: jsonResponse['data']['form'],
-                                      permohonan_id: widget.permohonan_id,
-                                    )));
-                          },
-                          child: Text('Edit Form')),
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => RequestForm(
+                                            form_id: jsonResponse['data']
+                                                ['form_id'],
+                                            form: jsonResponse['data']['form'],
+                                            permohonan_id: widget.permohonan_id,
+                                          )));
+                                },
+                                child: Text('EDIT')),
+                          )),
+                          Expanded(
+                              child: Container(
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green),
+                                onPressed: () async {
+                                  Map data = {
+                                    'permohonan_id': widget.permohonan_id,
+                                    'status': 'pending',
+                                    'alasan': '',
+                                  };
+
+                                  SharedPreferences sharedPreferences =
+                                      await SharedPreferences.getInstance();
+
+                                  var user_token =
+                                      sharedPreferences.getString("user_token");
+
+                                  var jsonResponse = null;
+                                  String api_url =
+                                      "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          user_token!;
+
+                                  var response = await http
+                                      .post(Uri.parse(api_url), body: data);
+
+                                  jsonResponse = json.decode(response.body);
+
+                                  if (jsonResponse['status'] == 200) {
+                                    String generate_pdf_url =
+                                        "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                            user_token +
+                                            "/" +
+                                            widget.permohonan_id;
+                                    var response_pdf = await http
+                                        .get(Uri.parse(generate_pdf_url));
+
+                                    final snackbar = SnackBar(
+                                        content: Text(
+                                            "Dokumen permohonan telah dikirim"));
+                                    _messangerKey.currentState!
+                                        .showSnackBar(snackbar);
+
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => DetailForm(
+                                                  permohonan_id:
+                                                      widget.permohonan_id,
+                                                  status: 'Pending',
+                                                  has_edit_access:
+                                                      widget.has_edit_access,
+                                                )));
+                                  } else {
+                                    print(jsonResponse['field_error']);
+                                  }
+                                },
+                                child: Text('KIRIM')),
+                          ))
+                        ],
+                      ),
                     ),
                   ),
                   Visibility(
@@ -597,7 +665,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.17:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -607,7 +675,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.17:8080/api/form/generatepdf/" +
+                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
@@ -701,7 +769,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.17:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -711,7 +779,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.17:8080/api/form/generatepdf/" +
+                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
