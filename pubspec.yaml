@@ -19,6 +19,8 @@ dependencies:
   document_file_save_plus: ^2.0.0
   string_extensions: ^0.6.6
   flutter_file_downloader: ^1.1.0+1
+  file_picker: ^5.3.0
+  dio: ^5.1.2
 
 dev_dependencies:
   flutter_test:
