@@ -470,13 +470,17 @@ class _DetailFormState extends State<DetailForm> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               String pdf_file = snapshot.data as String;
-                              return Container(
-                                  padding: EdgeInsets.all(20),
-                                  height: 500,
-                                  child: SfPdfViewer.network(
-                                    pdf_file,
-                                    key: _pdfViewerKey,
-                                  ));
+                              if (pdf_file != '') {
+                                return Container(
+                                    padding: EdgeInsets.all(20),
+                                    height: 500,
+                                    child: SfPdfViewer.network(
+                                      pdf_file,
+                                      key: _pdfViewerKey,
+                                    ));
+                              } else {
+                                return Container();
+                              }
                             }
 
                             return Container();
