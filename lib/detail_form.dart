@@ -395,6 +395,30 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: 4,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              child: Text('Lampiran',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors
+                                                          .grey.shade600)),
+                                            ),
+                                            Container(
+                                              child: Text(
+                                                  api_data[index].lampiran == ""
+                                                      ? "-"
+                                                      : api_data[index]
+                                                          .lampiran,
+                                                  style:
+                                                      TextStyle(fontSize: 16)),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ));
                               });
