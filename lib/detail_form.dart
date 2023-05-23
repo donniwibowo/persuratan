@@ -375,7 +375,7 @@ class _DetailFormState extends State<DetailForm> {
                                           ],
                                         ),
                                         SizedBox(
-                                          height: 4,
+                                          height: 6,
                                         ),
                                         Row(
                                           children: [
@@ -395,9 +395,9 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(
-                                          height: 4,
-                                        ),
+                                        // SizedBox(
+                                        //   height: 4,
+                                        // ),
                                         Row(
                                           children: [
                                             Container(
@@ -409,13 +409,48 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
-                                              child: Text(
-                                                  api_data[index].lampiran == ""
-                                                      ? "-"
-                                                      : api_data[index]
-                                                          .lampiran,
-                                                  style:
-                                                      TextStyle(fontSize: 16)),
+                                              child: TextButton(
+                                                style: TextButton.styleFrom(
+                                                    padding: EdgeInsets.only(
+                                                        left: 0)),
+                                                onPressed: () {
+                                                  FileDownloader.downloadFile(
+                                                      url:
+                                                          'http://192.168.1.66:8080/documents/' +
+                                                              api_data[index]
+                                                                  .lampiran,
+                                                      onProgress:
+                                                          (name, progress) {
+                                                        print(progress);
+                                                        final snackbar = SnackBar(
+                                                            content: Text(
+                                                                "Downloading..."));
+                                                        _messangerKey
+                                                            .currentState!
+                                                            .showSnackBar(
+                                                                snackbar);
+                                                      },
+                                                      onDownloadCompleted:
+                                                          (value) {
+                                                        print("Downloaded!");
+                                                        final snackbar = SnackBar(
+                                                            content: Text(
+                                                                "Dokumen berhasil didownload"));
+                                                        _messangerKey
+                                                            .currentState!
+                                                            .showSnackBar(
+                                                                snackbar);
+                                                      });
+                                                },
+                                                child: Text(
+                                                    api_data[index].lampiran ==
+                                                            ""
+                                                        ? "-"
+                                                        : api_data[index]
+                                                            .lampiran,
+                                                    style: TextStyle(
+                                                        fontSize: 16)),
+                                              ),
                                             ),
                                           ],
                                         ),
