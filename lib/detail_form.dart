@@ -415,10 +415,12 @@ class _DetailFormState extends State<DetailForm> {
                                                         left: 0)),
                                                 onPressed: () {
                                                   FileDownloader.downloadFile(
+                                                      // url:
+                                                      //     'http://192.168.1.66:8080/documents/' +
+                                                      //         api_data[index]
+                                                      //             .lampiran,
                                                       url:
-                                                          'http://192.168.1.66:8080/documents/' +
-                                                              api_data[index]
-                                                                  .lampiran,
+                                                          'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
                                                       onProgress:
                                                           (name, progress) {
                                                         print(progress);
@@ -496,7 +498,9 @@ class _DetailFormState extends State<DetailForm> {
                                       backgroundColor: Colors.lightBlue),
                                   onPressed: () {
                                     FileDownloader.downloadFile(
-                                        url: pdf_file,
+                                        // url: pdf_file,
+                                        url:
+                                            'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
                                         onProgress: (name, progress) {
                                           print(progress);
                                           final snackbar = SnackBar(

@@ -60,6 +60,7 @@ class _RequestFormState extends State<RequestForm> {
   bool isFormPeminjaman = true;
   String dokumen_terlampir = "";
   File? _selectedFile;
+  bool isChecked = false;
   @override
   void initState() {
     super.initState();
@@ -101,6 +102,18 @@ class _RequestFormState extends State<RequestForm> {
 
   @override
   Widget build(BuildContext context) {
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return Colors.blue;
+      }
+      return Colors.red;
+    }
+
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
@@ -122,8 +135,37 @@ class _RequestFormState extends State<RequestForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 20,
+                  height: 15,
                 ),
+                Container(
+                    padding: EdgeInsets.only(right: 20, left: 3),
+                    // margin: EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          checkColor: Colors.white,
+                          fillColor:
+                              MaterialStateProperty.resolveWith(getColor),
+                          value: isChecked,
+                          onChanged: (bool? value) async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            String fullname =
+                                await prefs.getString('fullname') ?? '';
+                            setState(() {
+                              isChecked = value!;
+
+                              if (isChecked) {
+                                input_nama.text = fullname;
+                              } else {
+                                input_nama.text = "";
+                              }
+                            });
+                          },
+                        ),
+                        Text('Gunakan data pribadi?')
+                      ],
+                    )),
                 Visibility(
                   visible: isFormPeminjaman,
                   child: Container(
