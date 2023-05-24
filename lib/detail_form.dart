@@ -399,6 +399,8 @@ class _DetailFormState extends State<DetailForm> {
                                         //   height: 4,
                                         // ),
                                         Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: [
                                             Container(
                                               width: 150,
@@ -462,7 +464,7 @@ class _DetailFormState extends State<DetailForm> {
                         } else {
                           return Container(
                             padding: EdgeInsets.only(left: 18, top: 15),
-                            child: Text("Tidak ada data"),
+                            child: Text(widget.permohonan_id),
                           );
                         }
                       }
