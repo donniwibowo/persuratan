@@ -62,7 +62,7 @@ class _RequestFormState extends State<RequestForm> {
     // } else {
     //   selectedJenisPeminjaman = "0";
     // }
-
+    selectedJenisPeminjaman = "0";
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
     }
