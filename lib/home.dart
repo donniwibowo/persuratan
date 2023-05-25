@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:swipe/swipe.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -28,7 +29,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with TickerProviderStateMixin {
   final _messangerKey = GlobalKey<ScaffoldMessengerState>();
   late String selectedForm;
   late String selectedFormLabel;
@@ -46,6 +47,9 @@ class _HomeState extends State<Home> {
   Color status_label_color = Colors.blue;
   Color status_text_color = Colors.white;
 
+  // late AnimationController _animation_controller;
+  // late Animation<double> _animation;
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +66,7 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'http://192.168.1.66:8080/api/form/countnotif/' + user_token;
+        'http://192.168.153.143:8080/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -353,404 +357,593 @@ class _HomeState extends State<Home> {
                                   status_label_color = Colors.blue;
                                   status_text_color = Colors.white;
                                 }
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                            builder: (context) => DetailForm(
-                                                  permohonan_id: api_data[index]
-                                                      .permohonan_id,
-                                                  status:
-                                                      api_data[index].status,
-                                                  has_edit_access:
-                                                      api_data[index]
-                                                          .has_edit_access,
-                                                )));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.only(
-                                        top: 10,
-                                        left: 15,
-                                        right: 15,
-                                        bottom: 0),
+
+                                AnimationController _animation_controller =
+                                    new AnimationController(
+                                  vsync: this,
+                                  duration: const Duration(milliseconds: 200),
+                                );
+                                Animation<double> _animation =
+                                    new CurvedAnimation(
+                                  parent: _animation_controller,
+                                  curve: new Interval(0.0, 1.0,
+                                      curve: Curves.linear),
+                                );
+
+                                // _animation_controller.reverse();
+                                return SlideTransition(
+                                  position: new Tween<Offset>(
+                                    begin: Offset.zero,
+                                    end: const Offset(1.0, 0.0),
+                                  ).animate(_animation),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                              builder: (context) => DetailForm(
+                                                    permohonan_id:
+                                                        api_data[index]
+                                                            .permohonan_id,
+                                                    status:
+                                                        api_data[index].status,
+                                                    has_edit_access:
+                                                        api_data[index]
+                                                            .has_edit_access,
+                                                  )));
+                                    },
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Colors.grey.shade400),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))),
                                       padding: EdgeInsets.only(
                                           top: 10,
-                                          left: 10,
-                                          bottom: 10,
-                                          right: 10),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          left: 15,
+                                          right: 15,
+                                          bottom: 0),
+                                      child: Swipe(
+                                        verticalMaxWidthThreshold: 50,
+                                        verticalMinDisplacement: 100,
+                                        verticalMinVelocity: 300,
+                                        horizontalMaxHeightThreshold: 50,
+                                        horizontalMinDisplacement: 100,
+                                        horizontalMinVelocity: 300,
+                                        onSwipeLeft: () {
+                                          // _animation_controller.reverse();
+                                          if (api_data[index].status ==
+                                                  'Draft' &&
+                                              api_data[index].has_edit_access ==
+                                                  "1") {
+                                            Widget cancelButton =
+                                                ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.white),
+                                              child: Text(
+                                                "Tutup",
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pop();
+                                              },
+                                            );
+                                            Widget continueButton =
+                                                ElevatedButton(
+                                              child: Text("Hapus"),
+                                              onPressed: () async {
+                                                Map data = {
+                                                  'permohonan_id':
+                                                      api_data[index]
+                                                          .permohonan_id,
+                                                };
+                                                SharedPreferences
+                                                    sharedPreferences =
+                                                    await SharedPreferences
+                                                        .getInstance();
+
+                                                var user_token =
+                                                    sharedPreferences.getString(
+                                                        "user_token");
+
+                                                var jsonResponse = null;
+                                                String api_url =
+                                                    "http://192.168.153.143:8080/api/form/deletepermohonan/" +
+                                                        user_token!;
+
+                                                var response = await http.post(
+                                                    Uri.parse(api_url),
+                                                    body: data);
+
+                                                jsonResponse =
+                                                    json.decode(response.body);
+                                                print(jsonResponse);
+
+                                                if (jsonResponse['status'] ==
+                                                    200) {
+                                                  reloadData();
+
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .pop();
+
+                                                  final snackbar = SnackBar(
+                                                      content: Text(
+                                                          "Dokumen permohonan telah dihapus"));
+                                                  _messangerKey.currentState!
+                                                      .showSnackBar(snackbar);
+                                                } else {
+                                                  print(jsonResponse[
+                                                      'field_error']);
+                                                }
+                                              },
+                                            );
+                                            AlertDialog alert = AlertDialog(
+                                              title: Text("Konfirmasi"),
+                                              content: Text(
+                                                  "Apakah anda yakin untuk menghapus dokumen ini?"),
+                                              actions: [
+                                                cancelButton,
+                                                continueButton,
+                                              ],
+                                            );
+                                            // show the dialog
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
+                                              },
+                                            );
+                                          }
+                                        },
+                                        onSwipeRight: () async {
+                                          if (api_data[index].status ==
+                                                  'Draft' &&
+                                              api_data[index].has_edit_access ==
+                                                  "1") {
+                                            _animation_controller.forward();
+                                            SharedPreferences prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            String user_token = await prefs
+                                                    .getString('user_token') ??
+                                                'unknown';
+
+                                            final api_url =
+                                                'http://192.168.153.143:8080/api/form/getpermohonanforedit/' +
+                                                    user_token +
+                                                    '/' +
+                                                    api_data[index]
+                                                        .permohonan_id;
+                                            final response = await http
+                                                .get(Uri.parse(api_url));
+                                            var jsonResponse =
+                                                json.decode(response.body);
+                                            // print(jsonResponse['data']['form']);
+
+                                            _animation_controller.reset();
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        RequestForm(
+                                                          form_id: jsonResponse[
+                                                                  'data']
+                                                              ['form_id'],
+                                                          form: jsonResponse[
+                                                              'data']['form'],
+                                                          permohonan_id:
+                                                              api_data[index]
+                                                                  .permohonan_id,
+                                                        )));
+                                          }
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade400),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          padding: EdgeInsets.only(
+                                              top: 10,
+                                              left: 10,
+                                              bottom: 10,
+                                              right: 10),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Row(
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text(
-                                                      "Perihal",
-                                                      style: TextStyle(
-                                                          color: Colors.black54,
-                                                          fontSize: 16),
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    width: 170,
-                                                    child: Text(
-                                                        api_data[index].perihal,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)
-                                                        // maxLines: 2,
-                                                        // overflow:
-                                                        //     TextOverflow.visible,
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text(
+                                                          "Perihal",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black54,
+                                                              fontSize: 16),
                                                         ),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text("Nama",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        width: 170,
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .perihal,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)
+                                                            // maxLines: 2,
+                                                            // overflow:
+                                                            //     TextOverflow.visible,
+                                                            ),
+                                                      )
+                                                    ],
                                                   ),
-                                                  Container(
-                                                    child: Text(
-                                                        api_data[index].nama,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text("Tanggal Mulai",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  SizedBox(
+                                                    height: 5,
                                                   ),
-                                                  Container(
-                                                    child: Text(
-                                                        api_data[index]
-                                                            .date_start,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text(
-                                                        "Tanggal Berakhir",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text("Nama",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .nama,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
                                                   ),
-                                                  Container(
-                                                    child: Text(
-                                                        api_data[index]
-                                                            .date_end,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text("Dokumen",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  SizedBox(
+                                                    height: 5,
                                                   ),
-                                                  Container(
-                                                    width: 170,
-                                                    child: Text(
-                                                        api_data[index]
-                                                            .pdf_filename,
-                                                        style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text(
-                                                        "Tanggal Dibuat",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text(
+                                                            "Tanggal Mulai",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .date_start,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
                                                   ),
-                                                  Container(
-                                                    child: Text(
-                                                        api_data[index]
-                                                            .created_on,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text("Status",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  SizedBox(
+                                                    height: 5,
                                                   ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            status_label_color,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5)),
-                                                    padding: EdgeInsets.only(
-                                                        left: 10,
-                                                        top: 3,
-                                                        bottom: 3,
-                                                        right: 10),
-                                                    child: Text(
-                                                        api_data[index].status,
-                                                        style: TextStyle(
-                                                            color:
-                                                                status_text_color,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: 135,
-                                                    child: Text("Approval By",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black54,
-                                                            fontSize: 16)),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text(
+                                                            "Tanggal Berakhir",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .date_end,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
                                                   ),
-                                                  Container(
-                                                    child: Text(
-                                                        api_data[index]
-                                                            .response_by,
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16)),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Visibility(
-                                                visible:
-                                                    api_data[index].alasan ==
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text("Dokumen",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        width: 170,
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .pdf_filename,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text(
+                                                            "Tanggal Dibuat",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .created_on,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text("Status",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                                status_label_color,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 10,
+                                                                top: 3,
+                                                                bottom: 3,
+                                                                right: 10),
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .status,
+                                                            style: TextStyle(
+                                                                color:
+                                                                    status_text_color,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 135,
+                                                        child: Text(
+                                                            "Approval By",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 16)),
+                                                      ),
+                                                      Container(
+                                                        child: Text(
+                                                            api_data[index]
+                                                                .response_by,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 16)),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Visibility(
+                                                    visible: api_data[index]
+                                                                    .alasan ==
                                                                 "" ||
                                                             api_data[index]
                                                                     .alasan ==
                                                                 "-"
                                                         ? false
                                                         : true,
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      // height: 50,
-                                                      width: 300,
-                                                      padding:
-                                                          EdgeInsets.fromLTRB(
-                                                              15, 10, 15, 10),
-                                                      decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .grey.shade300,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text("Alasan"),
-                                                          SizedBox(
-                                                            height: 5,
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          // height: 50,
+                                                          width: 300,
+                                                          padding: EdgeInsets
+                                                              .fromLTRB(15, 10,
+                                                                  15, 10),
+                                                          decoration: BoxDecoration(
+                                                              color: Colors.grey
+                                                                  .shade300,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5)),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text("Alasan"),
+                                                              SizedBox(
+                                                                height: 5,
+                                                              ),
+                                                              Text(api_data[
+                                                                      index]
+                                                                  .alasan)
+                                                            ],
                                                           ),
-                                                          Text(api_data[index]
-                                                              .alasan)
-                                                        ],
-                                                      ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
+                                              Visibility(
+                                                visible: api_data[index]
+                                                                .status ==
+                                                            'Draft' &&
+                                                        api_data[index]
+                                                                .has_edit_access ==
+                                                            "1"
+                                                    ? true
+                                                    : false,
+                                                child: Container(
+                                                    child: IconButton(
+                                                        onPressed: () {
+                                                          Widget cancelButton =
+                                                              ElevatedButton(
+                                                            style: ElevatedButton
+                                                                .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white),
+                                                            child: Text(
+                                                              "Tutup",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context,
+                                                                      rootNavigator:
+                                                                          true)
+                                                                  .pop();
+                                                            },
+                                                          );
+                                                          Widget
+                                                              continueButton =
+                                                              ElevatedButton(
+                                                            child:
+                                                                Text("Hapus"),
+                                                            onPressed:
+                                                                () async {
+                                                              Map data = {
+                                                                'permohonan_id':
+                                                                    api_data[
+                                                                            index]
+                                                                        .permohonan_id,
+                                                              };
+                                                              SharedPreferences
+                                                                  sharedPreferences =
+                                                                  await SharedPreferences
+                                                                      .getInstance();
+
+                                                              var user_token =
+                                                                  sharedPreferences
+                                                                      .getString(
+                                                                          "user_token");
+
+                                                              var jsonResponse =
+                                                                  null;
+                                                              String api_url =
+                                                                  "http://192.168.153.143:8080/api/form/deletepermohonan/" +
+                                                                      user_token!;
+
+                                                              var response =
+                                                                  await http.post(
+                                                                      Uri.parse(
+                                                                          api_url),
+                                                                      body:
+                                                                          data);
+
+                                                              jsonResponse =
+                                                                  json.decode(
+                                                                      response
+                                                                          .body);
+                                                              print(
+                                                                  jsonResponse);
+
+                                                              if (jsonResponse[
+                                                                      'status'] ==
+                                                                  200) {
+                                                                reloadData();
+
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop();
+
+                                                                final snackbar =
+                                                                    SnackBar(
+                                                                        content:
+                                                                            Text("Dokumen permohonan telah dihapus"));
+                                                                _messangerKey
+                                                                    .currentState!
+                                                                    .showSnackBar(
+                                                                        snackbar);
+                                                              } else {
+                                                                print(jsonResponse[
+                                                                    'field_error']);
+                                                              }
+                                                            },
+                                                          );
+                                                          AlertDialog alert =
+                                                              AlertDialog(
+                                                            title: Text(
+                                                                "Konfirmasi"),
+                                                            content: Text(
+                                                                "Apakah anda yakin untuk menghapus dokumen ini?"),
+                                                            actions: [
+                                                              cancelButton,
+                                                              continueButton,
+                                                            ],
+                                                          );
+                                                          // show the dialog
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return alert;
+                                                            },
+                                                          );
+                                                        },
+                                                        color: Colors.red,
+                                                        icon: Icon(
+                                                            Icons.delete))),
+                                              )
                                             ],
                                           ),
-                                          Visibility(
-                                            visible: api_data[index].status ==
-                                                        'Draft' &&
-                                                    api_data[index]
-                                                            .has_edit_access ==
-                                                        "1"
-                                                ? true
-                                                : false,
-                                            child: Container(
-                                                child: IconButton(
-                                                    onPressed: () {
-                                                      Widget cancelButton =
-                                                          ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white),
-                                                        child: Text(
-                                                          "Tutup",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                        onPressed: () {
-                                                          Navigator.of(context,
-                                                                  rootNavigator:
-                                                                      true)
-                                                              .pop();
-                                                        },
-                                                      );
-                                                      Widget continueButton =
-                                                          ElevatedButton(
-                                                        child: Text("Hapus"),
-                                                        onPressed: () async {
-                                                          Map data = {
-                                                            'permohonan_id':
-                                                                api_data[index]
-                                                                    .permohonan_id,
-                                                          };
-                                                          SharedPreferences
-                                                              sharedPreferences =
-                                                              await SharedPreferences
-                                                                  .getInstance();
-
-                                                          var user_token =
-                                                              sharedPreferences
-                                                                  .getString(
-                                                                      "user_token");
-
-                                                          var jsonResponse =
-                                                              null;
-                                                          String api_url =
-                                                              "http://192.168.1.66:8080/api/form/deletepermohonan/" +
-                                                                  user_token!;
-
-                                                          var response =
-                                                              await http.post(
-                                                                  Uri.parse(
-                                                                      api_url),
-                                                                  body: data);
-
-                                                          jsonResponse = json
-                                                              .decode(response
-                                                                  .body);
-                                                          print(jsonResponse);
-
-                                                          if (jsonResponse[
-                                                                  'status'] ==
-                                                              200) {
-                                                            reloadData();
-
-                                                            Navigator.of(
-                                                                    context,
-                                                                    rootNavigator:
-                                                                        true)
-                                                                .pop();
-
-                                                            final snackbar = SnackBar(
-                                                                content: Text(
-                                                                    "Dokumen permohonan telah dihapus"));
-                                                            _messangerKey
-                                                                .currentState!
-                                                                .showSnackBar(
-                                                                    snackbar);
-                                                          } else {
-                                                            print(jsonResponse[
-                                                                'field_error']);
-                                                          }
-                                                        },
-                                                      );
-                                                      AlertDialog alert =
-                                                          AlertDialog(
-                                                        title:
-                                                            Text("Konfirmasi"),
-                                                        content: Text(
-                                                            "Apakah anda yakin untuk menghapus dokumen ini?"),
-                                                        actions: [
-                                                          cancelButton,
-                                                          continueButton,
-                                                        ],
-                                                      );
-                                                      // show the dialog
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return alert;
-                                                        },
-                                                      );
-                                                    },
-                                                    color: Colors.red,
-                                                    icon: Icon(Icons.delete))),
-                                          )
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
