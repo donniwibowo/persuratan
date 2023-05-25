@@ -19,6 +19,7 @@ class PermohonanModel {
   String is_open_for_notif;
   String response_by;
   String alasan;
+  String lampiran;
   String created_on;
   String created_by;
   String updated_on;
@@ -41,6 +42,7 @@ class PermohonanModel {
       required this.is_open_for_notif,
       required this.response_by,
       required this.alasan,
+      required this.lampiran,
       required this.created_on,
       required this.created_by,
       required this.updated_on,
@@ -64,6 +66,7 @@ class PermohonanModel {
           is_open_for_notif: json["is_open_for_notif"],
           response_by: json["response_by"],
           alasan: json["alasan"],
+          lampiran: json["lampiran"],
           created_on: json["created_on"],
           created_by: json["created_by"],
           updated_on: json["updated_on"],

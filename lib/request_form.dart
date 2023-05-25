@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:persuratan/api/api_form.dart';
 import 'package:persuratan/api/api_jenis_peminjaman.dart';
@@ -16,7 +19,9 @@ import 'package:persuratan/model/form.dart';
 import 'package:persuratan/model/jenis_peminjaman.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:string_extensions/string_extensions.dart';
@@ -53,7 +58,9 @@ class _RequestFormState extends State<RequestForm> {
   List<DropdownMenuItem<String>> jenisPeminjamanList = [];
   ApiJenisPeminjaman api_jenis_peminjaman = ApiJenisPeminjaman();
   bool isFormPeminjaman = true;
-
+  String dokumen_terlampir = "";
+  File? _selectedFile;
+  bool isChecked = false;
   @override
   void initState() {
     super.initState();
@@ -66,12 +73,16 @@ class _RequestFormState extends State<RequestForm> {
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
     }
+
+    setState(() {
+      input_perihal.text = widget.form;
+    });
   }
 
   getDataPermohonan(String _id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.17:8080/api/form/getpermohonanforedit/' +
+    var api_url = 'http://192.168.153.143:8080/api/form/getpermohonanforedit/' +
         user_token +
         '/' +
         _id;
@@ -91,6 +102,18 @@ class _RequestFormState extends State<RequestForm> {
 
   @override
   Widget build(BuildContext context) {
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return Colors.blue;
+      }
+      return Colors.red;
+    }
+
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
@@ -104,6 +127,8 @@ class _RequestFormState extends State<RequestForm> {
               ),
               onTap: () {
                 Navigator.pop(context);
+                // Navigator.of(context)
+                //     .push(MaterialPageRoute(builder: (context) => Home()));
               },
             ),
           ),
@@ -112,8 +137,37 @@ class _RequestFormState extends State<RequestForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 20,
+                  height: 15,
                 ),
+                Container(
+                    padding: EdgeInsets.only(right: 20, left: 3),
+                    // margin: EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          checkColor: Colors.white,
+                          fillColor:
+                              MaterialStateProperty.resolveWith(getColor),
+                          value: isChecked,
+                          onChanged: (bool? value) async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            String fullname =
+                                await prefs.getString('fullname') ?? '';
+                            setState(() {
+                              isChecked = value!;
+
+                              if (isChecked) {
+                                input_nama.text = fullname;
+                              } else {
+                                input_nama.text = "";
+                              }
+                            });
+                          },
+                        ),
+                        Text('Gunakan data pribadi?')
+                      ],
+                    )),
                 Visibility(
                   visible: isFormPeminjaman,
                   child: Container(
@@ -335,6 +389,60 @@ class _RequestFormState extends State<RequestForm> {
                         }
                       },
                     )),
+                Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: TextButton(
+                        onPressed: () async {
+                          final result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['docx', 'pdf', 'doc'],
+                          );
+
+                          if (result != null) {
+                            // Do something with the file
+                            try {
+                              _selectedFile = File(result.files.single.path!);
+                              PlatformFile file_data = result.files.first;
+
+                              if (file_data.size / 1024 > 1000) {
+                                final snackbar = SnackBar(
+                                    content: Text(
+                                        "Batas maksimal ukuran dokumen adalah 1 MB"));
+                                _messangerKey.currentState!
+                                    .showSnackBar(snackbar);
+                              } else {
+                                setState(() {
+                                  dokumen_terlampir = file_data.name;
+                                });
+                              }
+                            } catch (e) {
+                              final snackbar = SnackBar(
+                                  content: Text(
+                                      "Pelampiran dokumen pendukung gagal"));
+                              _messangerKey.currentState!
+                                  .showSnackBar(snackbar);
+                            }
+                          }
+                        },
+                        child: Container(
+                          child: Row(
+                            children: [
+                              Icon(Icons.attach_file),
+                              Text('Lampirkan Dokumen')
+                            ],
+                          ),
+                        ))),
+                Visibility(
+                    visible: dokumen_terlampir == "" ? false : true,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 45),
+                      child: Row(
+                        children: [
+                          Text("Dokumen Terlampir : "),
+                          Text(dokumen_terlampir)
+                        ],
+                      ),
+                    )),
                 Visibility(
                   visible: true,
                   child: Container(
@@ -349,9 +457,10 @@ class _RequestFormState extends State<RequestForm> {
                               // style: ElevatedButton.styleFrom(
                               //     backgroundColor: Colors.green),
                               onPressed: () {
-                                submitData('draft');
+                                Navigator.pop(context);
+                                // submitData('draft');
                               },
-                              child: Text('DRAFT')),
+                              child: Text('BATAL')),
                         )),
                         Expanded(
                             child: Container(
@@ -359,9 +468,17 @@ class _RequestFormState extends State<RequestForm> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green),
                               onPressed: () {
-                                submitData('pending');
+                                if (_selectedFile == null) {
+                                  print('no attached file');
+                                  submitDataNoAttachedFile('draft');
+                                } else {
+                                  print('file attached');
+                                  submitData('draft', {'file': _selectedFile!});
+                                }
+                                // submitData('pending');
+                                // submitData('draft', {'file': _selectedFile!});
                               },
-                              child: Text('KIRIM')),
+                              child: Text('DRAFT')),
                         ))
                       ],
                     ),
@@ -481,12 +598,11 @@ class _RequestFormState extends State<RequestForm> {
     );
   }
 
-  submitData(String _status) async {
+  submitDataNoAttachedFile(String _status) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var user_token = prefs.getString("user_token");
-
-    Map data = {
+    Map<String, dynamic> data = {
       'permohonan_id': widget.permohonan_id,
       'form_id': widget.form_id,
       'jenis_peminjaman_id': selectedJenisPeminjaman,
@@ -503,17 +619,18 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://192.168.1.17:8080/api/form/createpermohonan/" + user_token!;
+        "http://192.168.153.143:8080/api/form/createpermohonan/" + user_token!;
 
     var response = await http.post(Uri.parse(api_url), body: data);
     jsonResponse = json.decode(response.body);
 
     if (jsonResponse['status'] == 200) {
       String generate_pdf_url =
-          "http://192.168.1.17:8080/api/form/generatepdf/" +
+          "http://192.168.153.143:8080/api/form/generatepdf/" +
               user_token +
               "/" +
               jsonResponse['data']['permohonan_id'];
+
       var response_pdf = await http.get(Uri.parse(generate_pdf_url));
 
       if (widget.permohonan_id == "0") {
@@ -526,14 +643,93 @@ class _RequestFormState extends State<RequestForm> {
         _messangerKey.currentState!.showSnackBar(snackbar);
       }
 
-      // generatePDFFile(jsonResponse['data']['permohonan_id'],
-      //     jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
+      generatePDFFile(jsonResponse['data']['permohonan_id'],
+          jsonResponse['data']['status'], jsonResponse['data']['pdf_filename']);
 
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => DetailForm(
                 permohonan_id: jsonResponse['data']['permohonan_id'],
                 status: jsonResponse['data']['status'],
                 has_edit_access: jsonResponse['data']['has_edit_access'],
+              )));
+    } else {
+      print(jsonResponse);
+      final snackbar = SnackBar(content: Text("Failed to load data"));
+      _messangerKey.currentState!.showSnackBar(snackbar);
+    }
+  }
+
+  submitData(String _status, Map<String, File> files) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    var user_token = prefs.getString("user_token");
+    Map<String, dynamic> data = {
+      'permohonan_id': widget.permohonan_id,
+      'form_id': widget.form_id,
+      'jenis_peminjaman_id': selectedJenisPeminjaman,
+      'perihal': input_perihal.text,
+      'nrp': input_nrp.text,
+      'nama': input_nama.text,
+      'universitas': input_universitas.text,
+      'keterangan': input_keterangan.text,
+      'date_start': date_start.text,
+      'date_end': date_end.text,
+      'status': _status,
+      'alasan': '',
+    };
+
+    Map<String, dio.MultipartFile> fileMap = {};
+    for (MapEntry fileEntry in files.entries) {
+      File file = fileEntry.value;
+      String fileName = path.basename(file.path);
+      fileMap[fileEntry.key] = dio.MultipartFile(
+          file.openRead(), await file.length(),
+          filename: fileName);
+    }
+    data.addAll(fileMap);
+    var formData = FormData.fromMap(data);
+
+    var jsonResponse = null;
+    String api_url =
+        "http://192.168.153.143:8080/api/form/createpermohonan/" + user_token!;
+
+    // var response = await http.post(Uri.parse(api_url), body: data);
+    // jsonResponse = json.decode(response.body);
+
+    Dio _dio = new Dio();
+    var response = await _dio.post(api_url,
+        data: formData, options: Options(contentType: 'multipart/form-data'));
+
+    // if (jsonResponse['status'] == 200) {
+    if (response.data['status'] == 200) {
+      // print(response.data['data']['permohonan_id']);
+      String generate_pdf_url =
+          "http://192.168.153.143:8080/api/form/generatepdf/" +
+              user_token +
+              "/" +
+              response.data['data']['permohonan_id'];
+      var response_pdf = await http.get(Uri.parse(generate_pdf_url));
+
+      if (widget.permohonan_id == "0") {
+        final snackbar =
+            SnackBar(content: Text("Surat Permohonan telah berhasil dibuat"));
+        _messangerKey.currentState!.showSnackBar(snackbar);
+      } else {
+        final snackbar =
+            SnackBar(content: Text("Surat Permohonan telah berhasil diubah"));
+        _messangerKey.currentState!.showSnackBar(snackbar);
+      }
+
+      generatePDFFile(
+          response.data['data']['permohonan_id'],
+          response.data['data']['status'],
+          response.data['data']['pdf_filename']);
+
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => DetailForm(
+                permohonan_id: response.data['data']['permohonan_id'],
+                status: response.data['data']['status'],
+                has_edit_access: response.data['data']['has_edit_access'],
               )));
     } else {
       print(jsonResponse);
