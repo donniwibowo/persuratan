@@ -86,10 +86,11 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
-        user_token +
-        '/' +
-        _permohonan_id;
+    var api_url =
+        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpdffilename/' +
+            user_token +
+            '/' +
+            _permohonan_id;
 
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
@@ -106,17 +107,19 @@ class _DetailFormState extends State<DetailForm> {
   Future<String> getPDF(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
-        user_token +
-        '/' +
-        _permohonan_id;
+    var api_url =
+        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpdffilename/' +
+            user_token +
+            '/' +
+            _permohonan_id;
 
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
     String pdf_filename = '';
     if (jsonResponse['data'] != null) {
       pdf_filename =
-          'http://192.168.1.66:8080/documents/' + jsonResponse['data'];
+          'https://tigajayabahankue.com/dms-persuratan/public/documents/' +
+              jsonResponse['data'];
     }
 
     return pdf_filename;
@@ -418,7 +421,7 @@ class _DetailFormState extends State<DetailForm> {
                                                 onPressed: () {
                                                   FileDownloader.downloadFile(
                                                       // url:
-                                                      //     'http://192.168.1.66:8080/documents/' +
+                                                      //     'https://tigajayabahankue.com/dms-persuratan/public/documents/' +
                                                       //         api_data[index]
                                                       //             .lampiran,
                                                       url:
@@ -541,7 +544,7 @@ class _DetailFormState extends State<DetailForm> {
                                     padding: EdgeInsets.all(20),
                                     height: 500,
                                     child: SfPdfViewer.network(
-                                      'http://192.168.1.66:8080/documents/34343_1_PengajuanPassport.pdf',
+                                      pdf_file,
                                       key: _pdfViewerKey,
                                     ));
                               } else {
@@ -582,7 +585,7 @@ class _DetailFormState extends State<DetailForm> {
                   //         padding: EdgeInsets.all(20),
                   //         height: 500,
                   //         child: SfPdfViewer.network(
-                  //           'http://192.168.1.66:8080/documents/report2.pdf',
+                  //           'https://tigajayabahankue.com/dms-persuratan/public/documents/report2.pdf',
                   //           key: _pdfViewerKey,
                   //         )),
                   //   ],
@@ -609,7 +612,7 @@ class _DetailFormState extends State<DetailForm> {
                                           'unknown';
 
                                   final api_url =
-                                      'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+                                      'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpermohonanforedit/' +
                                           user_token +
                                           '/' +
                                           widget.permohonan_id;
@@ -648,7 +651,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   var jsonResponse = null;
                                   String api_url =
-                                      "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                      "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
                                           user_token!;
 
                                   var response = await http
@@ -658,7 +661,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   if (jsonResponse['status'] == 200) {
                                     String generate_pdf_url =
-                                        "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                        "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
                                             user_token +
                                             "/" +
                                             widget.permohonan_id;
@@ -721,6 +724,7 @@ class _DetailFormState extends State<DetailForm> {
                                   Widget continueButton = ElevatedButton(
                                     child: Text("Terima"),
                                     onPressed: () async {
+                                      print("Accept");
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
                                         'status': 'approved',
@@ -735,45 +739,37 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
                                           .post(Uri.parse(api_url), body: data);
-
                                       jsonResponse = json.decode(response.body);
-
+                                      print(jsonResponse);
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                            "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
                                         var response_pdf = await http
                                             .get(Uri.parse(generate_pdf_url));
 
-                                        // generatePDFFile(
-                                        //     jsonResponse['data']
-                                        //         ['permohonan_id'],
-                                        //     jsonResponse['data']['status'],
-                                        //     jsonResponse['data']
-                                        //         ['pdf_filename'],
-                                        //     jsonResponse['data']['nrp'],
-                                        //     jsonResponse['data']['nama'],
-                                        //     jsonResponse['data']['universitas'],
-                                        //     jsonResponse['data']['perihal'],
-                                        //     jsonResponse['data']['date_start'],
-                                        //     jsonResponse['data']['date_end'],
-                                        //     jsonResponse['data']
-                                        //         ['response_by']);
                                         setState(() {
                                           current_status = 'Approved';
                                         });
                                         reloadData();
 
-                                        Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop();
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DetailForm(
+                                                      permohonan_id:
+                                                          widget.permohonan_id,
+                                                      status: widget.status,
+                                                      has_edit_access: widget
+                                                          .has_edit_access,
+                                                    )));
 
                                         final snackbar = SnackBar(
                                             content: Text(
@@ -839,7 +835,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -849,7 +845,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                            "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
@@ -875,9 +871,20 @@ class _DetailFormState extends State<DetailForm> {
                                         });
                                         reloadData();
 
-                                        Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop();
+                                        // Navigator.of(context,
+                                        //         rootNavigator: true)
+                                        //     .pop();
+
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DetailForm(
+                                                      permohonan_id:
+                                                          widget.permohonan_id,
+                                                      status: widget.status,
+                                                      has_edit_access: widget
+                                                          .has_edit_access,
+                                                    )));
 
                                         final snackbar = SnackBar(
                                             content: Text(
