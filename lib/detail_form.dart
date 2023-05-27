@@ -86,7 +86,7 @@ class _DetailFormState extends State<DetailForm> {
   Future<File> getLocalDirectory(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+    var api_url = 'http://192.168.1.119:8080/api/form/getpdffilename/' +
         user_token +
         '/' +
         _permohonan_id;
@@ -106,7 +106,7 @@ class _DetailFormState extends State<DetailForm> {
   Future<String> getPDF(String _permohonan_id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.66:8080/api/form/getpdffilename/' +
+    var api_url = 'http://192.168.1.119:8080/api/form/getpdffilename/' +
         user_token +
         '/' +
         _permohonan_id;
@@ -116,7 +116,7 @@ class _DetailFormState extends State<DetailForm> {
     String pdf_filename = '';
     if (jsonResponse['data'] != null) {
       pdf_filename =
-          'http://192.168.1.66:8080/documents/' + jsonResponse['data'];
+          'http://192.168.1.119:8080/documents/' + jsonResponse['data'];
     }
 
     return pdf_filename;
@@ -418,7 +418,7 @@ class _DetailFormState extends State<DetailForm> {
                                                 onPressed: () {
                                                   FileDownloader.downloadFile(
                                                       // url:
-                                                      //     'http://192.168.1.66:8080/documents/' +
+                                                      //     'http://192.168.1.119:8080/documents/' +
                                                       //         api_data[index]
                                                       //             .lampiran,
                                                       url:
@@ -537,7 +537,6 @@ class _DetailFormState extends State<DetailForm> {
                               String pdf_file = snapshot.data as String;
                               if (pdf_file != '') {
                                 print(pdf_file);
-                                // return Container();
                                 return Container(
                                     padding: EdgeInsets.all(20),
                                     height: 500,
@@ -583,7 +582,7 @@ class _DetailFormState extends State<DetailForm> {
                   //         padding: EdgeInsets.all(20),
                   //         height: 500,
                   //         child: SfPdfViewer.network(
-                  //           'http://192.168.1.66:8080/documents/report2.pdf',
+                  //           'http://192.168.1.119:8080/documents/report2.pdf',
                   //           key: _pdfViewerKey,
                   //         )),
                   //   ],
@@ -610,7 +609,7 @@ class _DetailFormState extends State<DetailForm> {
                                           'unknown';
 
                                   final api_url =
-                                      'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+                                      'http://192.168.1.119:8080/api/form/getpermohonanforedit/' +
                                           user_token +
                                           '/' +
                                           widget.permohonan_id;
@@ -649,7 +648,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   var jsonResponse = null;
                                   String api_url =
-                                      "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                      "http://192.168.1.119:8080/api/form/updatestatus/" +
                                           user_token!;
 
                                   var response = await http
@@ -659,7 +658,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   if (jsonResponse['status'] == 200) {
                                     String generate_pdf_url =
-                                        "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                        "http://192.168.1.119:8080/api/form/generatepdf/" +
                                             user_token +
                                             "/" +
                                             widget.permohonan_id;
@@ -736,7 +735,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.119:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -746,7 +745,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                            "http://192.168.1.119:8080/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
@@ -840,7 +839,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "http://192.168.1.66:8080/api/form/updatestatus/" +
+                                          "http://192.168.1.119:8080/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -850,7 +849,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "http://192.168.1.66:8080/api/form/generatepdf/" +
+                                            "http://192.168.1.119:8080/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;

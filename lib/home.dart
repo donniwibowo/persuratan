@@ -66,7 +66,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'http://192.168.1.66:8080/api/form/countnotif/' + user_token;
+        'http://192.168.1.119:8080/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -446,7 +446,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
                                                 var jsonResponse = null;
                                                 String api_url =
-                                                    "http://192.168.1.66:8080/api/form/deletepermohonan/" +
+                                                    "http://192.168.1.119:8080/api/form/deletepermohonan/" +
                                                         user_token!;
 
                                                 var response = await http.post(
@@ -508,7 +508,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 'unknown';
 
                                             final api_url =
-                                                'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
+                                                'http://192.168.1.119:8080/api/form/getpermohonanforedit/' +
                                                     user_token +
                                                     '/' +
                                                     api_data[index]
@@ -567,7 +567,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         ),
                                                       ),
                                                       Container(
-                                                        width: 170,
+                                                        width: 150,
                                                         child: Text(
                                                             api_data[index]
                                                                 .perihal,
@@ -670,7 +670,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 fontSize: 16)),
                                                       ),
                                                       Container(
-                                                        width: 170,
+                                                        width: 150,
                                                         child: Text(
                                                             api_data[index]
                                                                 .pdf_filename,
@@ -874,7 +874,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                               var jsonResponse =
                                                                   null;
                                                               String api_url =
-                                                                  "http://192.168.1.66:8080/api/form/deletepermohonan/" +
+                                                                  "http://192.168.1.119:8080/api/form/deletepermohonan/" +
                                                                       user_token!;
 
                                                               var response =

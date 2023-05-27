@@ -32,10 +32,11 @@ class ApiJenisPeminjaman extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url = 'http://192.168.1.66:8080/api/form/getalljenispeminjaman/' +
-        user_token +
-        '/' +
-        _form_id;
+    final api_url =
+        'http://192.168.1.119:8080/api/form/getalljenispeminjaman/' +
+            user_token +
+            '/' +
+            _form_id;
     final response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
