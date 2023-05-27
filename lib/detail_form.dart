@@ -724,7 +724,9 @@ class _DetailFormState extends State<DetailForm> {
                                   Widget continueButton = ElevatedButton(
                                     child: Text("Terima"),
                                     onPressed: () async {
-                                      print("Accept");
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
                                         'status': 'approved',
@@ -821,6 +823,8 @@ class _DetailFormState extends State<DetailForm> {
                                   Widget continueButton = ElevatedButton(
                                     child: Text("Tolak"),
                                     onPressed: () async {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
                                       Map data = {
                                         'permohonan_id': widget.permohonan_id,
                                         'status': 'rejected',
