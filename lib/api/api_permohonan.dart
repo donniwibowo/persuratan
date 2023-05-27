@@ -32,7 +32,7 @@ class ApiPermohonan extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url = 'http://192.168.1.119:8080/api/form/getallpermohonan/' +
+    final api_url = 'http://192.168.1.66:8080/api/form/getallpermohonan/' +
         user_token +
         '/' +
         keyword;
@@ -55,7 +55,7 @@ class ApiPermohonan extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
-    final api_url = 'http://192.168.1.119:8080/api/form/getpermohonan/' +
+    final api_url = 'http://192.168.1.66:8080/api/form/getpermohonan/' +
         user_token +
         '/' +
         permohonan_id +
@@ -79,7 +79,7 @@ class ApiPermohonan extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'http://192.168.1.119:8080/api/form/getunreadpermohonan/' + user_token;
+        'http://192.168.1.66:8080/api/form/getunreadpermohonan/' + user_token;
     final response = await http.get(Uri.parse(api_url));
 
     if (response.statusCode == 200) {

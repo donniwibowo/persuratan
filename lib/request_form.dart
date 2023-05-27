@@ -82,7 +82,7 @@ class _RequestFormState extends State<RequestForm> {
   getDataPermohonan(String _id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://192.168.1.119:8080/api/form/getpermohonanforedit/' +
+    var api_url = 'http://192.168.1.66:8080/api/form/getpermohonanforedit/' +
         user_token +
         '/' +
         _id;
@@ -619,14 +619,14 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://192.168.1.119:8080/api/form/createpermohonan/" + user_token!;
+        "http://192.168.1.66:8080/api/form/createpermohonan/" + user_token!;
 
     var response = await http.post(Uri.parse(api_url), body: data);
     jsonResponse = json.decode(response.body);
 
     if (jsonResponse['status'] == 200) {
       String generate_pdf_url =
-          "http://192.168.1.119:8080/api/form/generatepdf/" +
+          "http://192.168.1.66:8080/api/form/generatepdf/" +
               user_token +
               "/" +
               jsonResponse['data']['permohonan_id'];
@@ -691,7 +691,7 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://192.168.1.119:8080/api/form/createpermohonan/" + user_token!;
+        "http://192.168.1.66:8080/api/form/createpermohonan/" + user_token!;
 
     // var response = await http.post(Uri.parse(api_url), body: data);
     // jsonResponse = json.decode(response.body);
@@ -704,7 +704,7 @@ class _RequestFormState extends State<RequestForm> {
     if (response.data['status'] == 200) {
       // print(response.data['data']['permohonan_id']);
       String generate_pdf_url =
-          "http://192.168.1.119:8080/api/form/generatepdf/" +
+          "http://192.168.1.66:8080/api/form/generatepdf/" +
               user_token +
               "/" +
               response.data['data']['permohonan_id'];
