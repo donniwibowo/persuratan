@@ -122,7 +122,7 @@ class _Login extends State<Login> {
                             };
                             var jsonResponse = null;
                             var api_url =
-                                'http://192.168.153.143:8080/api/user/login';
+                                'http://192.168.1.66:8080/api/user/login';
                             var response =
                                 await http.post(Uri.parse(api_url), body: data);
                             jsonResponse = json.decode(response.body);
