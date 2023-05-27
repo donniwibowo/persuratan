@@ -536,6 +536,7 @@ class _DetailFormState extends State<DetailForm> {
                             if (snapshot.hasData) {
                               String pdf_file = snapshot.data as String;
                               if (pdf_file != '') {
+                                print(pdf_file);
                                 return Container(
                                     padding: EdgeInsets.all(20),
                                     height: 500,

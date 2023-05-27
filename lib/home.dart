@@ -567,7 +567,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         ),
                                                       ),
                                                       Container(
-                                                        width: 170,
+                                                        width: 150,
                                                         child: Text(
                                                             api_data[index]
                                                                 .perihal,
@@ -670,7 +670,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 fontSize: 16)),
                                                       ),
                                                       Container(
-                                                        width: 170,
+                                                        width: 150,
                                                         child: Text(
                                                             api_data[index]
                                                                 .pdf_filename,
