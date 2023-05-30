@@ -87,7 +87,7 @@ class _DetailFormState extends State<DetailForm> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     var api_url =
-        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpdffilename/' +
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpdffilename/' +
             user_token +
             '/' +
             _permohonan_id;
@@ -108,7 +108,7 @@ class _DetailFormState extends State<DetailForm> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     var api_url =
-        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpdffilename/' +
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpdffilename/' +
             user_token +
             '/' +
             _permohonan_id;
@@ -118,7 +118,7 @@ class _DetailFormState extends State<DetailForm> {
     String pdf_filename = '';
     if (jsonResponse['data'] != null) {
       pdf_filename =
-          'https://tigajayabahankue.com/dms-persuratan/public/documents/' +
+          'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/documents/' +
               jsonResponse['data'];
     }
 
@@ -420,12 +420,12 @@ class _DetailFormState extends State<DetailForm> {
                                                         left: 0)),
                                                 onPressed: () {
                                                   FileDownloader.downloadFile(
-                                                      // url:
-                                                      //     'https://tigajayabahankue.com/dms-persuratan/public/documents/' +
-                                                      //         api_data[index]
-                                                      //             .lampiran,
                                                       url:
-                                                          'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
+                                                          'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/documents/' +
+                                                              api_data[index]
+                                                                  .lampiran,
+                                                      // url:
+                                                      //     'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
                                                       onProgress:
                                                           (name, progress) {
                                                         print(progress);
@@ -503,9 +503,9 @@ class _DetailFormState extends State<DetailForm> {
                                       backgroundColor: Colors.lightBlue),
                                   onPressed: () {
                                     FileDownloader.downloadFile(
-                                        // url: pdf_file,
-                                        url:
-                                            'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
+                                        url: pdf_file,
+                                        // url:
+                                        //     'https://github.com/c14190074/leap_integra/blob/main/master/dms/uploads/documents/FilePDF.pdf',
                                         onProgress: (name, progress) {
                                           print(progress);
                                           final snackbar = SnackBar(
@@ -585,7 +585,7 @@ class _DetailFormState extends State<DetailForm> {
                   //         padding: EdgeInsets.all(20),
                   //         height: 500,
                   //         child: SfPdfViewer.network(
-                  //           'https://tigajayabahankue.com/dms-persuratan/public/documents/report2.pdf',
+                  //           'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/documents/report2.pdf',
                   //           key: _pdfViewerKey,
                   //         )),
                   //   ],
@@ -612,7 +612,7 @@ class _DetailFormState extends State<DetailForm> {
                                           'unknown';
 
                                   final api_url =
-                                      'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpermohonanforedit/' +
+                                      'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpermohonanforedit/' +
                                           user_token +
                                           '/' +
                                           widget.permohonan_id;
@@ -651,7 +651,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   var jsonResponse = null;
                                   String api_url =
-                                      "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
+                                      "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/updatestatus/" +
                                           user_token!;
 
                                   var response = await http
@@ -661,7 +661,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                   if (jsonResponse['status'] == 200) {
                                     String generate_pdf_url =
-                                        "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
+                                        "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/generatepdf/" +
                                             user_token +
                                             "/" +
                                             widget.permohonan_id;
@@ -741,7 +741,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
+                                          "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -750,7 +750,7 @@ class _DetailFormState extends State<DetailForm> {
                                       print(jsonResponse);
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
+                                            "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;
@@ -839,7 +839,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       var jsonResponse = null;
                                       String api_url =
-                                          "https://tigajayabahankue.com/dms-persuratan/public/api/form/updatestatus/" +
+                                          "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/updatestatus/" +
                                               user_token!;
 
                                       var response = await http
@@ -849,7 +849,7 @@ class _DetailFormState extends State<DetailForm> {
 
                                       if (jsonResponse['status'] == 200) {
                                         String generate_pdf_url =
-                                            "https://tigajayabahankue.com/dms-persuratan/public/api/form/generatepdf/" +
+                                            "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/generatepdf/" +
                                                 user_token +
                                                 "/" +
                                                 widget.permohonan_id;

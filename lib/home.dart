@@ -66,7 +66,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'https://tigajayabahankue.com/dms-persuratan/public/api/form/countnotif/' + user_token;
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/countnotif/' + user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -446,7 +446,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
                                                 var jsonResponse = null;
                                                 String api_url =
-                                                    "https://tigajayabahankue.com/dms-persuratan/public/api/form/deletepermohonan/" +
+                                                    "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/deletepermohonan/" +
                                                         user_token!;
 
                                                 var response = await http.post(
@@ -508,7 +508,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                 'unknown';
 
                                             final api_url =
-                                                'https://tigajayabahankue.com/dms-persuratan/public/api/form/getpermohonanforedit/' +
+                                                'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpermohonanforedit/' +
                                                     user_token +
                                                     '/' +
                                                     api_data[index]
@@ -874,7 +874,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                               var jsonResponse =
                                                                   null;
                                                               String api_url =
-                                                                  "https://tigajayabahankue.com/dms-persuratan/public/api/form/deletepermohonan/" +
+                                                                  "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/deletepermohonan/" +
                                                                       user_token!;
 
                                                               var response =

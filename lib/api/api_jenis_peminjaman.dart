@@ -33,7 +33,7 @@ class ApiJenisPeminjaman extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getalljenispeminjaman/' +
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getalljenispeminjaman/' +
             user_token +
             '/' +
             _form_id;

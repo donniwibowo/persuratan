@@ -32,7 +32,7 @@ class ApiForm extends ChangeNotifier {
     String user_token = await prefs.getString('user_token') ?? 'unknown';
 
     final api_url =
-        'https://tigajayabahankue.com/dms-persuratan/public/api/form/getallform/' + user_token;
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getallform/' + user_token;
     final response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
     if (jsonResponse['status'] == 200) {

@@ -122,7 +122,7 @@ class _Login extends State<Login> {
                             };
                             var jsonResponse = null;
                             var api_url =
-                                'https://tigajayabahankue.com/dms-persuratan/public/api/user/login';
+                                'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/user/login';
                             var response =
                                 await http.post(Uri.parse(api_url), body: data);
                             jsonResponse = json.decode(response.body);
