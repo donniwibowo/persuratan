@@ -274,7 +274,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
-                                              width: 200,
+                                              width: 170,
                                               child: Text(
                                                   api_data[index].perihal,
                                                   style:
