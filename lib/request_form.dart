@@ -108,7 +108,7 @@ class _RequestFormState extends State<RequestForm> {
             _id;
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
-    if (jsonResponse['status'] == 200) {
+    if (jsonResponse['status'] == 200 && jsonResponse['len_data'] > 0) {
       // print(jsonResponse['data'][0]);
       setState(() {
         input_perihal.text =
