@@ -66,7 +66,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
     String api_url =
-        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/countnotif/' + user_token;
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/countnotif/' +
+            user_token;
     var response = await http.get(Uri.parse(api_url));
 
     var jsonResponse = json.decode(response.body);
@@ -191,6 +192,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           ),
           backgroundColor: Colors.grey.shade200,
           floatingActionButton: FloatingActionButton(
+            heroTag: "btnCreateNewDoc",
             onPressed: () {
               showDialog(
                   context: context,
