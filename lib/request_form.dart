@@ -64,11 +64,6 @@ class _RequestFormState extends State<RequestForm> {
   @override
   void initState() {
     super.initState();
-    // if (widget.form == 'Peminjaman') {
-    //   isFormPeminjaman = true;
-    // } else {
-    //   selectedJenisPeminjaman = "0";
-    // }
     selectedJenisPeminjaman = "0";
     if (widget.permohonan_id != "0") {
       getDataPermohonan(widget.permohonan_id);
@@ -82,10 +77,11 @@ class _RequestFormState extends State<RequestForm> {
   getDataPermohonan(String _id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_token = await prefs.getString('user_token') ?? 'unknown';
-    var api_url = 'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpermohonanforedit/' +
-        user_token +
-        '/' +
-        _id;
+    var api_url =
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getpermohonanforedit/' +
+            user_token +
+            '/' +
+            _id;
     var response = await http.get(Uri.parse(api_url));
     var jsonResponse = json.decode(response.body);
 
@@ -191,10 +187,12 @@ class _RequestFormState extends State<RequestForm> {
                             if (api_data.length < 1) {
                               return Container();
                             } else {
-                              selectedJenisPeminjaman =
-                                  api_data[0].jenis_peminjaman_id;
-                              selectedJenisPeminjamanLabel =
-                                  api_data[0].jenis_peminjaman;
+                              if (selectedJenisPeminjaman == "0") {
+                                selectedJenisPeminjaman =
+                                    api_data[0].jenis_peminjaman_id;
+                                selectedJenisPeminjamanLabel =
+                                    api_data[0].jenis_peminjaman;
+                              }
                             }
 
                             return DecoratedBox(
@@ -215,22 +213,19 @@ class _RequestFormState extends State<RequestForm> {
                                         items: jenisPeminjamanList,
                                         onChanged: (String? newValue) {
                                           dropDownState(() {
-                                            dropDownState(() {
-                                              selectedJenisPeminjaman =
-                                                  newValue!;
-
-                                              for (var i = 0;
-                                                  i < api_data.length;
-                                                  i++) {
-                                                if (selectedJenisPeminjaman ==
+                                            selectedJenisPeminjaman = newValue!;
+                                            print(selectedJenisPeminjaman);
+                                            for (var i = 0;
+                                                i < api_data.length;
+                                                i++) {
+                                              if (selectedJenisPeminjaman ==
+                                                  api_data[i]
+                                                      .jenis_peminjaman_id) {
+                                                selectedJenisPeminjamanLabel =
                                                     api_data[i]
-                                                        .jenis_peminjaman_id) {
-                                                  selectedJenisPeminjamanLabel =
-                                                      api_data[i]
-                                                          .jenis_peminjaman;
-                                                }
+                                                        .jenis_peminjaman;
                                               }
-                                            });
+                                            }
                                           });
                                         },
                                         icon: const Padding(
@@ -619,7 +614,8 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/createpermohonan/" + user_token!;
+        "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/createpermohonan/" +
+            user_token!;
 
     var response = await http.post(Uri.parse(api_url), body: data);
     jsonResponse = json.decode(response.body);
@@ -691,7 +687,8 @@ class _RequestFormState extends State<RequestForm> {
 
     var jsonResponse = null;
     String api_url =
-        "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/createpermohonan/" + user_token!;
+        "http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/createpermohonan/" +
+            user_token!;
 
     // var response = await http.post(Uri.parse(api_url), body: data);
     // jsonResponse = json.decode(response.body);

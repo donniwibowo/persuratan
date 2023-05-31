@@ -246,20 +246,23 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                               items: formList,
                                               onChanged: (String? newValue) {
                                                 dropDownState(() {
-                                                  dropDownState(() {
-                                                    selectedForm = newValue!;
-                                                    for (var i = 0;
-                                                        i < form_data.length;
-                                                        i++) {
-                                                      if (selectedForm ==
-                                                          form_data[i]
-                                                              .form_id) {
-                                                        selectedFormLabel =
-                                                            form_data[i].form;
-                                                      }
+                                                  selectedForm = newValue!;
+                                                  for (var i = 0;
+                                                      i < form_data.length;
+                                                      i++) {
+                                                    if (selectedForm ==
+                                                        form_data[i].form_id) {
+                                                      selectedFormLabel =
+                                                          form_data[i].form;
                                                     }
-                                                  });
+                                                  }
                                                 });
+
+                                                // dropDownState(() {
+                                                //   dropDownState(() {
+
+                                                //   });
+                                                // });
                                               },
                                               icon: const Padding(
                                                   padding:
