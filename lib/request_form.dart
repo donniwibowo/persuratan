@@ -214,7 +214,7 @@ class _RequestFormState extends State<RequestForm> {
                                         onChanged: (String? newValue) {
                                           dropDownState(() {
                                             selectedJenisPeminjaman = newValue!;
-                                            print(selectedJenisPeminjaman);
+
                                             for (var i = 0;
                                                 i < api_data.length;
                                                 i++) {
@@ -224,6 +224,12 @@ class _RequestFormState extends State<RequestForm> {
                                                 selectedJenisPeminjamanLabel =
                                                     api_data[i]
                                                         .jenis_peminjaman;
+                                                setState(() {
+                                                  input_perihal.text = widget
+                                                          .form +
+                                                      ' ' +
+                                                      selectedJenisPeminjamanLabel;
+                                                });
                                               }
                                             }
                                           });
