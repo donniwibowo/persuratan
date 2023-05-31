@@ -72,6 +72,8 @@ class _RequestFormState extends State<RequestForm> {
     setState(() {
       input_perihal.text = widget.form;
     });
+
+    getJenisPeminjaman(widget.form_id);
   }
 
   getDataPermohonan(String _id) async {
@@ -94,6 +96,25 @@ class _RequestFormState extends State<RequestForm> {
       date_start.text = jsonResponse['data']['date_start'];
       date_end.text = jsonResponse['data']['date_end'];
     });
+  }
+
+  getJenisPeminjaman(String _id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_token = await prefs.getString('user_token') ?? 'unknown';
+    var api_url =
+        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/form/getalljenispeminjaman/' +
+            user_token +
+            '/' +
+            _id;
+    var response = await http.get(Uri.parse(api_url));
+    var jsonResponse = json.decode(response.body);
+    if (jsonResponse['status'] == 200) {
+      // print(jsonResponse['data'][0]);
+      setState(() {
+        input_perihal.text =
+            widget.form + ' ' + jsonResponse['data'][0]['jenis_peminjaman'];
+      });
+    }
   }
 
   @override
