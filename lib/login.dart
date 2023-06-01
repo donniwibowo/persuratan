@@ -25,18 +25,20 @@ class _Login extends State<Login> {
   isLogin() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     var user_token = prefs.getString("user_token");
-    var api_url =
-        'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/user/islogin/' +
-            user_token!;
-    var response = await http.get(Uri.parse(api_url));
-    var jsonResponse = json.decode(response.body);
-    if (jsonResponse['message'] == 0) {
-      prefs.clear();
-      prefs.commit();
-    } else {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (BuildContext context) => Home()),
-          (Route<dynamic> route) => false);
+    if (user_token != null) {
+      var api_url =
+          'http://34.101.208.151/agutask/persuratan/persuratan-api/rest-api-persuratan/public/api/user/islogin/' +
+              user_token;
+      var response = await http.get(Uri.parse(api_url));
+      var jsonResponse = json.decode(response.body);
+      if (jsonResponse['message'] == 0) {
+        prefs.clear();
+        prefs.commit();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (BuildContext context) => Home()),
+            (Route<dynamic> route) => false);
+      }
     }
   }
 
