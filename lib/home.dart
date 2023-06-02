@@ -86,6 +86,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    double c_width = MediaQuery.of(context).size.width * 0.5;
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
@@ -572,7 +573,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                         ),
                                                       ),
                                                       Container(
-                                                        width: 150,
+                                                        width: c_width,
                                                         child: Text(
                                                             api_data[index]
                                                                 .perihal,
@@ -601,6 +602,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 fontSize: 16)),
                                                       ),
                                                       Container(
+                                                        width: c_width,
                                                         child: Text(
                                                             api_data[index]
                                                                 .nama,
@@ -675,7 +677,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 fontSize: 16)),
                                                       ),
                                                       Container(
-                                                        width: 150,
+                                                        width: c_width,
                                                         child: Text(
                                                             api_data[index]
                                                                 .pdf_filename,
@@ -763,6 +765,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                                                 fontSize: 16)),
                                                       ),
                                                       Container(
+                                                        width: c_width,
                                                         child: Text(
                                                             api_data[index]
                                                                 .response_by,

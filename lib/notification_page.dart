@@ -45,6 +45,7 @@ class _NotificationState extends State<NotificatioPage> {
 
   @override
   Widget build(BuildContext context) {
+    double c_width = MediaQuery.of(context).size.width * 0.8;
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
@@ -135,7 +136,7 @@ class _NotificationState extends State<NotificatioPage> {
                                                       .spaceBetween,
                                               children: [
                                                 Container(
-                                                  width: 300,
+                                                  width: c_width,
                                                   child: Text(
                                                     api_data[index].perihal,
                                                     style:

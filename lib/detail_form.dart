@@ -127,6 +127,7 @@ class _DetailFormState extends State<DetailForm> {
 
   @override
   Widget build(BuildContext context) {
+    double c_width = MediaQuery.of(context).size.width * 0.5;
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
@@ -213,6 +214,7 @@ class _DetailFormState extends State<DetailForm> {
                                               ),
                                             ),
                                             Container(
+                                              width: c_width,
                                               child: Text(api_data[index].nrp,
                                                   style:
                                                       TextStyle(fontSize: 16)),
@@ -233,6 +235,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
+                                              width: c_width,
                                               child: Text(api_data[index].nama,
                                                   style:
                                                       TextStyle(fontSize: 16)),
@@ -253,6 +256,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
+                                              width: c_width,
                                               child: Text(
                                                   api_data[index].universitas,
                                                   style:
@@ -274,7 +278,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
-                                              width: 170,
+                                              width: c_width,
                                               child: Text(
                                                   api_data[index].perihal,
                                                   style:
@@ -370,6 +374,7 @@ class _DetailFormState extends State<DetailForm> {
                                                           .grey.shade600)),
                                             ),
                                             Container(
+                                              width: c_width,
                                               child: Text(
                                                   api_data[index].response_by,
                                                   style:
