@@ -156,35 +156,35 @@ class _RequestFormState extends State<RequestForm> {
                 SizedBox(
                   height: 15,
                 ),
-                Container(
-                    padding: EdgeInsets.only(right: 20, left: 3),
-                    // margin: EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        Checkbox(
-                          checkColor: Colors.white,
-                          fillColor:
-                              MaterialStateProperty.resolveWith(getColor),
-                          value: isChecked,
-                          onChanged: (bool? value) async {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            String fullname =
-                                await prefs.getString('fullname') ?? '';
-                            setState(() {
-                              isChecked = value!;
+                // Container(
+                //     padding: EdgeInsets.only(right: 20, left: 3),
+                //     // margin: EdgeInsets.only(bottom: 10),
+                //     child: Row(
+                //       children: [
+                //         Checkbox(
+                //           checkColor: Colors.white,
+                //           fillColor:
+                //               MaterialStateProperty.resolveWith(getColor),
+                //           value: isChecked,
+                //           onChanged: (bool? value) async {
+                //             SharedPreferences prefs =
+                //                 await SharedPreferences.getInstance();
+                //             String fullname =
+                //                 await prefs.getString('fullname') ?? '';
+                //             setState(() {
+                //               isChecked = value!;
 
-                              if (isChecked) {
-                                input_nama.text = fullname;
-                              } else {
-                                input_nama.text = "";
-                              }
-                            });
-                          },
-                        ),
-                        Text('Gunakan data pribadi?')
-                      ],
-                    )),
+                //               if (isChecked) {
+                //                 input_nama.text = fullname;
+                //               } else {
+                //                 input_nama.text = "";
+                //               }
+                //             });
+                //           },
+                //         ),
+                //         Text('Gunakan data pribadi?')
+                //       ],
+                //     )),
                 Visibility(
                   visible: isFormPeminjaman,
                   child: Container(
@@ -291,39 +291,39 @@ class _RequestFormState extends State<RequestForm> {
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: TextField(
-                    controller: input_nrp,
-                    decoration: InputDecoration(
-                      hintText: 'NRP',
-                      // suffixIcon: Icon(Icons.email),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: TextField(
-                    controller: input_nama,
-                    decoration: InputDecoration(
-                      hintText: 'Nama',
-                      // suffixIcon: Icon(Icons.email),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 20, right: 20),
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: TextField(
-                    controller: input_universitas,
-                    decoration: InputDecoration(
-                      hintText: 'Universitas',
-                      // suffixIcon: Icon(Icons.email),
-                    ),
-                  ),
-                ),
+                // Container(
+                //   padding: EdgeInsets.only(left: 20, right: 20),
+                //   margin: EdgeInsets.only(bottom: 10),
+                //   child: TextField(
+                //     controller: input_nrp,
+                //     decoration: InputDecoration(
+                //       hintText: 'NRP',
+                //       // suffixIcon: Icon(Icons.email),
+                //     ),
+                //   ),
+                // ),
+                // Container(
+                //   padding: EdgeInsets.only(left: 20, right: 20),
+                //   margin: EdgeInsets.only(bottom: 10),
+                //   child: TextField(
+                //     controller: input_nama,
+                //     decoration: InputDecoration(
+                //       hintText: 'Nama',
+                //       // suffixIcon: Icon(Icons.email),
+                //     ),
+                //   ),
+                // ),
+                // Container(
+                //   padding: EdgeInsets.only(left: 20, right: 20),
+                //   margin: EdgeInsets.only(bottom: 10),
+                //   child: TextField(
+                //     controller: input_universitas,
+                //     decoration: InputDecoration(
+                //       hintText: 'Universitas',
+                //       // suffixIcon: Icon(Icons.email),
+                //     ),
+                //   ),
+                // ),
                 Container(
                   padding: EdgeInsets.only(left: 20, right: 20),
                   margin: EdgeInsets.only(bottom: 10),
@@ -629,9 +629,9 @@ class _RequestFormState extends State<RequestForm> {
       'form_id': widget.form_id,
       'jenis_peminjaman_id': selectedJenisPeminjaman,
       'perihal': input_perihal.text,
-      'nrp': input_nrp.text,
-      'nama': input_nama.text,
-      'universitas': input_universitas.text,
+      // 'nrp': input_nrp.text,
+      // 'nama': input_nama.text,
+      // 'universitas': input_universitas.text,
       'keterangan': input_keterangan.text,
       'date_start': date_start.text,
       'date_end': date_end.text,
@@ -691,9 +691,9 @@ class _RequestFormState extends State<RequestForm> {
       'form_id': widget.form_id,
       'jenis_peminjaman_id': selectedJenisPeminjaman,
       'perihal': input_perihal.text,
-      'nrp': input_nrp.text,
-      'nama': input_nama.text,
-      'universitas': input_universitas.text,
+      // 'nrp': input_nrp.text,
+      // 'nama': input_nama.text,
+      // 'universitas': input_universitas.text,
       'keterangan': input_keterangan.text,
       'date_start': date_start.text,
       'date_end': date_end.text,

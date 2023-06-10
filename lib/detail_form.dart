@@ -206,7 +206,7 @@ class _DetailFormState extends State<DetailForm> {
                                             Container(
                                               width: 150,
                                               child: Text(
-                                                'NRP',
+                                                'Dokumen ID',
                                                 style: TextStyle(
                                                     fontSize: 16,
                                                     color:
@@ -228,7 +228,7 @@ class _DetailFormState extends State<DetailForm> {
                                           children: [
                                             Container(
                                               width: 150,
-                                              child: Text('Nama',
+                                              child: Text('Perusahaan',
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors
@@ -236,7 +236,8 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                             Container(
                                               width: c_width,
-                                              child: Text(api_data[index].nama,
+                                              child: Text(
+                                                  api_data[index].universitas,
                                                   style:
                                                       TextStyle(fontSize: 16)),
                                             ),
@@ -249,7 +250,7 @@ class _DetailFormState extends State<DetailForm> {
                                           children: [
                                             Container(
                                               width: 150,
-                                              child: Text('Universitas',
+                                              child: Text('Nama',
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       color: Colors
@@ -257,8 +258,7 @@ class _DetailFormState extends State<DetailForm> {
                                             ),
                                             Container(
                                               width: c_width,
-                                              child: Text(
-                                                  api_data[index].universitas,
+                                              child: Text(api_data[index].nama,
                                                   style:
                                                       TextStyle(fontSize: 16)),
                                             ),
@@ -765,7 +765,7 @@ class _DetailFormState extends State<DetailForm> {
                                         setState(() {
                                           current_status = 'Approved';
                                         });
-                                        reloadData();
+                                        // reloadData();
 
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
@@ -773,7 +773,7 @@ class _DetailFormState extends State<DetailForm> {
                                                     DetailForm(
                                                       permohonan_id:
                                                           widget.permohonan_id,
-                                                      status: widget.status,
+                                                      status: "Approved",
                                                       has_edit_access: widget
                                                           .has_edit_access,
                                                     )));
@@ -878,7 +878,7 @@ class _DetailFormState extends State<DetailForm> {
                                         setState(() {
                                           current_status = 'Rejected';
                                         });
-                                        reloadData();
+                                        // reloadData();
 
                                         // Navigator.of(context,
                                         //         rootNavigator: true)
@@ -890,7 +890,7 @@ class _DetailFormState extends State<DetailForm> {
                                                     DetailForm(
                                                       permohonan_id:
                                                           widget.permohonan_id,
-                                                      status: widget.status,
+                                                      status: "Rejected",
                                                       has_edit_access: widget
                                                           .has_edit_access,
                                                     )));

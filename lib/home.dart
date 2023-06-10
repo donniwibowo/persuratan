@@ -86,7 +86,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    double c_width = MediaQuery.of(context).size.width * 0.5;
+    double c_width = MediaQuery.of(context).size.width * 0.4;
     return MaterialApp(
       scaffoldMessengerKey: _messangerKey,
       home: Scaffold(
